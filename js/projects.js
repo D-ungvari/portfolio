@@ -44,7 +44,7 @@ var projects = [
       'Parallax backgrounds and screen-wrapping.'
     ],
     stack: 'html / css / javascript / canvas 2d',
-    liveUrl: 'https://d-ungvari.github.io/platform-shooter/',
+    liveUrl: 'https://d-ungvari.github.io/platform-shooter/client/',
     sourceUrl: 'https://github.com/D-ungvari/platform-shooter'
   }
 ];
