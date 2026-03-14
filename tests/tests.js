@@ -159,10 +159,10 @@ T.describe('/about Command', function() {
     T.assertContains(mock.getAllText(), '> about');
   });
 
-  T.it('mentions browser development', function() {
+  T.it('mentions David Ungvari', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/about'].handler(mock);
-    T.assertContains(mock.getAllText(), 'browser');
+    T.assertContains(mock.getAllText(), 'David Ungvari');
   });
 
   T.it('includes separator lines', function() {
@@ -437,7 +437,7 @@ T.describe('Boot Sequence', function() {
   T.it('showWelcome includes tagline', function() {
     var mock = T.createMockTerminal();
     showWelcome(mock);
-    T.assertContains(mock.getAllText(), 'vanilla js');
+    T.assertContains(mock.getAllText(), 'full-stack');
   });
 
   T.it('showWelcome includes help hint', function() {

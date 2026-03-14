@@ -69,7 +69,7 @@ registerCommand('42', '', function(terminal) {
 // /neofetch — system info in ASCII art style
 registerCommand('/neofetch', '', function(terminal) {
   var lines = [
-    '        .--.          visitor@dave',
+    '        .--.          david@ungvari',
     '       |o_o |         ──────────────────',
     '       |:_/ |         OS: Portfolio Terminal v1.0',
     '      //   \\ \\        Shell: /commands',
@@ -149,7 +149,7 @@ registerCommand('/credits', '', function(terminal) {
     '  CREDITS',
     SEPARATOR,
     '',
-    '  design & code    Dave Ungvari',
+    '  design & code    David Ungvari',
     '  font             JetBrains Mono',
     '  hosting          GitHub Pages',
     '  framework        none (vanilla js)',

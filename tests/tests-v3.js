@@ -64,7 +64,7 @@ T.describe('/banner Command', function() {
   T.it('/banner shows tagline', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/banner'].handler(mock);
-    T.assertContains(mock.getAllText(), 'vanilla js');
+    T.assertContains(mock.getAllText(), 'full-stack');
   });
 });
 

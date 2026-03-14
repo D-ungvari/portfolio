@@ -79,16 +79,20 @@ registerCommand('/about', 'about me', function(terminal) {
     '> about',
     SEPARATOR,
     '',
-    '  I build things for the browser.',
+    '  David Ungvari',
+    '  Full-stack Developer @ Omada A/S, Copenhagen',
     '',
-    '  No frameworks. No build steps.',
-    '  Just HTML, CSS, and JavaScript',
-    '  doing what they do best.',
+    '  By day I build enterprise identity governance',
+    '  software with React, TypeScript, C#/.NET,',
+    '  GraphQL, and SQL Server.',
     '',
-    '  Interested in:',
-    '    - interactive browser experiences',
-    '    - creative frontend development',
-    '    - game development on the web',
+    '  By night I build browser games with zero',
+    '  dependencies — vanilla HTML, CSS, JavaScript,',
+    '  and Canvas 2D.',
+    '',
+    '  Education:',
+    '    - M.Sc. Information Science, Aalborg University',
+    '    - B.Tech Product Development, KEA Copenhagen',
     '',
     SEPARATOR,
     ''
@@ -104,6 +108,12 @@ registerCommand('/contact', 'get in touch', function(terminal) {
   terminal.outputLines(lines);
   terminal.outputHTML(
     '  github     <a href="https://github.com/D-ungvari" target="_blank" rel="noopener">github.com/D-ungvari</a>'
+  );
+  terminal.outputHTML(
+    '  linkedin   <a href="https://www.linkedin.com/in/davidungvari/" target="_blank" rel="noopener">linkedin.com/in/davidungvari</a>'
+  );
+  terminal.outputHTML(
+    '  email      <a href="mailto:qkaturo95@gmail.com" target="_blank" rel="noopener">qkaturo95@gmail.com</a>'
   );
   terminal.output('');
   terminal.output(SEPARATOR);

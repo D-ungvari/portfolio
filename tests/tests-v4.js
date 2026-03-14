@@ -21,7 +21,7 @@ T.describe('Easter Eggs — Neofetch', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
     var text = mock.getAllText();
-    T.assertContains(text, 'visitor@dave');
+    T.assertContains(text, 'david@ungvari');
     T.assertContains(text, 'OS:');
     T.assertContains(text, 'Shell:');
     T.assertContains(text, 'Theme:');

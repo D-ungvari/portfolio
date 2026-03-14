@@ -53,10 +53,10 @@ T.describe('/credits Command', function() {
     T.assertContains(mock.getAllText(), 'CREDITS');
   });
 
-  T.it('/credits mentions Dave Ungvari', function() {
+  T.it('/credits mentions David Ungvari', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/credits'].handler(mock);
-    T.assertContains(mock.getAllText(), 'Dave Ungvari');
+    T.assertContains(mock.getAllText(), 'David Ungvari');
   });
 
   T.it('/credits mentions JetBrains Mono', function() {

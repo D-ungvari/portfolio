@@ -26,7 +26,7 @@ function showWelcome(terminal) {
     terminal.output(WELCOME_ASCII[i], 'ascii');
   }
   terminal.output('');
-  terminal.output(' web developer. vanilla js enthusiast.', 'dim');
+  terminal.output(' full-stack developer. browser game builder.', 'dim');
   terminal.output(' ' + getTimeGreeting(), 'dim');
   terminal.output('');
   terminal.output(' type /help to see available commands.', 'dim');

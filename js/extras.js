@@ -28,11 +28,13 @@ registerCommand('/banner', 'show welcome banner', function(terminal) {
 
 // /skills — tech proficiency display
 var skills = [
-  { name: 'JavaScript', level: 95 },
+  { name: 'React/TS',   level: 90 },
+  { name: 'JavaScript',  level: 95 },
+  { name: 'C#/.NET',    level: 85 },
+  { name: 'GraphQL',    level: 85 },
   { name: 'HTML/CSS',   level: 90 },
+  { name: 'SQL Server',  level: 80 },
   { name: 'Canvas 2D',  level: 85 },
-  { name: 'Game Dev',   level: 80 },
-  { name: 'Node.js',    level: 70 },
   { name: 'Git',        level: 85 }
 ];
 
