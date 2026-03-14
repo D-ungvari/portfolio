@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Terminal — Tests</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0a;
+      color: #4af626;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      padding: 20px 40px;
+    }
+    h1 { color: #00d4ff; margin-bottom: 20px; font-size: 18px; }
+    #test-output { white-space: pre-wrap; }
+    #test-output div { min-height: 1.4em; }
+  </style>
+</head>
+<body>
+  <h1>Portfolio Terminal — Test Suite</h1>
+  <div id="test-output"></div>
+
+  <!-- The actual portfolio HTML structure (needed for DOM tests) -->
+  <div id="terminal" role="application" aria-label="Interactive terminal portfolio" style="display:none">
+    <div id="terminal-bar">
+      <span class="bar-dot red"></span>
+      <span class="bar-dot yellow"></span>
+      <span class="bar-dot green"></span>
+      <span class="bar-title">visitor@dave ~ /portfolio</span>
+    </div>
+    <div id="terminal-body" aria-live="polite" aria-relevant="additions">
+      <div id="output"></div>
+      <div id="input-line">
+        <span class="prompt">visitor@dave:~$&nbsp;</span>
+        <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
+        <input type="text" id="command-input"
+               autofocus autocomplete="off"
+               spellcheck="false" autocapitalize="off"
+               aria-label="Terminal command input">
+      </div>
+    </div>
+  </div>
+  <nav id="mobile-commands" aria-label="Quick commands" style="display:none">
+    <button data-cmd="/help">/help</button>
+    <button data-cmd="/projects">/projects</button>
+    <button data-cmd="/about">/about</button>
+    <button data-cmd="/contact">/contact</button>
+  </nav>
+
+  <!-- Load app scripts -->
+  <script src="../js/terminal.js"></script>
+  <script src="../js/commands.js"></script>
+  <script src="../js/projects.js"></script>
+  <script src="../js/easter-eggs.js"></script>
+  <script src="../js/game-overlay.js"></script>
+  <script src="../js/themes.js"></script>
+  <script src="../js/matrix.js"></script>
+  <script src="../js/extras.js"></script>
+  <script src="../js/boot.js"></script>
+  <script src="../js/konami.js"></script>
+  <script src="../js/idle.js"></script>
+
+  <!-- Load test harness and tests -->
+  <script src="test-harness.js"></script>
+  <script src="tests.js"></script>
+  <script src="tests-v2.js"></script>
+  <script src="tests-v3.js"></script>
+  <script src="tests-v4.js"></script>
+  <script src="tests-v5.js"></script>
+  <script src="tests-v6.js"></script>
+  <script src="tests-v7.js"></script>
+  <script src="tests-v8.js"></script>
+
+  <!-- Run tests -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      TestHarness.run();
+    });
+  </script>
+</body>
+</html>

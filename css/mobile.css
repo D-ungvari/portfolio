@@ -1,0 +1,70 @@
+#mobile-commands {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  background: #111111;
+  border-top: 1px solid var(--color-scrollbar);
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 100;
+}
+
+#mobile-commands button {
+  background: var(--color-chip-bg);
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  transition: background 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#mobile-commands button:active {
+  background: var(--color-border);
+  border-color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  #terminal {
+    padding: 0 16px;
+  }
+
+  body {
+    font-size: 13px;
+  }
+
+  #mobile-commands {
+    display: flex;
+  }
+
+  #terminal-body {
+    padding-bottom: 80px;
+  }
+
+  .output-line.ascii {
+    font-size: 8px;
+    line-height: 1.1;
+  }
+}
+
+@media (max-width: 480px) {
+  #terminal {
+    padding: 0 12px;
+  }
+
+  .output-line.ascii {
+    font-size: 6px;
+  }
+
+  #mobile-commands button {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}

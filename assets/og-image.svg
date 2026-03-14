@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+
+  <!-- Terminal window bar -->
+  <rect x="100" y="60" width="1000" height="510" rx="12" fill="#0a0a0a" stroke="#1a1a1a" stroke-width="1"/>
+  <rect x="100" y="60" width="1000" height="40" rx="12" fill="#151515"/>
+  <rect x="100" y="88" width="1000" height="12" fill="#151515"/>
+  <circle cx="130" cy="80" r="7" fill="#ff5f57"/>
+  <circle cx="155" cy="80" r="7" fill="#febc2e"/>
+  <circle cx="180" cy="80" r="7" fill="#28c840"/>
+  <text x="600" y="85" font-family="monospace" font-size="13" fill="#3a7a3a" text-anchor="middle">visitor@dave ~ /portfolio</text>
+
+  <!-- Terminal content -->
+  <text x="140" y="140" font-family="monospace" font-size="11" fill="#3a7a3a">> booting portfolio v1.0...</text>
+  <text x="140" y="158" font-family="monospace" font-size="11" fill="#3a7a3a">> ready.</text>
+
+  <!-- ASCII Art DAVE -->
+  <text x="140" y="200" font-family="monospace" font-size="14" fill="#4af626" style="text-shadow: 0 0 5px rgba(74,246,38,0.3)"> ██████╗  █████╗ ██╗   ██╗███████╗</text>
+  <text x="140" y="218" font-family="monospace" font-size="14" fill="#4af626"> ██╔══██╗██╔══██╗██║   ██║██╔════╝</text>
+  <text x="140" y="236" font-family="monospace" font-size="14" fill="#4af626"> ██║  ██║███████║██║   ██║█████╗</text>
+  <text x="140" y="254" font-family="monospace" font-size="14" fill="#4af626"> ██║  ██║██╔══██║╚██╗ ██╔╝██╔══╝</text>
+  <text x="140" y="272" font-family="monospace" font-size="14" fill="#4af626"> ██████╔╝██║  ██║ ╚████╔╝ ███████╗</text>
+  <text x="140" y="290" font-family="monospace" font-size="14" fill="#4af626"> ╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚══════╝</text>
+
+  <text x="140" y="320" font-family="monospace" font-size="13" fill="#3a7a3a"> web developer. vanilla js enthusiast.</text>
+  <text x="140" y="350" font-family="monospace" font-size="13" fill="#3a7a3a"> type /help to see available commands.</text>
+
+  <!-- Prompt -->
+  <text x="140" y="400" font-family="monospace" font-size="14" fill="#4af626" font-weight="bold">visitor@dave:~$</text>
+  <text x="340" y="400" font-family="monospace" font-size="14" fill="#ffffff">/projects</text>
+
+  <!-- Projects output -->
+  <text x="140" y="435" font-family="monospace" font-size="12" fill="#4af626">  /uxcrimes</text>
+  <text x="140" y="453" font-family="monospace" font-size="12" fill="#4af626">  An interactive browser game about dark UX patterns</text>
+
+  <text x="140" y="480" font-family="monospace" font-size="12" fill="#4af626">  /horde</text>
+  <text x="140" y="498" font-family="monospace" font-size="12" fill="#4af626">  A roguelike survival shooter</text>
+
+  <text x="140" y="525" font-family="monospace" font-size="12" fill="#4af626">  /platformer</text>
+  <text x="140" y="543" font-family="monospace" font-size="12" fill="#4af626">  An arcade platform shooter with waves of enemies</text>
+</svg>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dave Ungvari — Portfolio Terminal</title>
+  <meta name="description" content="Dave Ungvari's developer portfolio. Type /help to explore.">
+  <meta property="og:title" content="Dave Ungvari — Portfolio Terminal">
+  <meta property="og:description" content="A terminal-themed developer portfolio. Type /help to explore projects.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og-image.svg">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/terminal.css">
+  <link rel="stylesheet" href="css/effects.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/game-overlay.css">
+</head>
+<body>
+  <div id="terminal" role="application" aria-label="Interactive terminal portfolio">
+    <div id="terminal-bar">
+      <span class="bar-dot red"></span>
+      <span class="bar-dot yellow"></span>
+      <span class="bar-dot green"></span>
+      <span class="bar-title">visitor@dave ~ /portfolio</span>
+    </div>
+    <div id="terminal-body" aria-live="polite" aria-relevant="additions">
+      <div id="output"></div>
+      <div id="input-line">
+        <span class="prompt">visitor@dave:~$&nbsp;</span>
+        <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
+        <input type="text" id="command-input"
+               autofocus autocomplete="off"
+               spellcheck="false" autocapitalize="off"
+               aria-label="Terminal command input">
+      </div>
+    </div>
+  </div>
+  <nav id="mobile-commands" aria-label="Quick commands">
+    <button data-cmd="/help">/help</button>
+    <button data-cmd="/projects">/projects</button>
+    <button data-cmd="/about">/about</button>
+    <button data-cmd="/contact">/contact</button>
+  </nav>
+
+  <script src="js/terminal.js"></script>
+  <script src="js/commands.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/game-overlay.js"></script>
+  <script src="js/easter-eggs.js"></script>
+  <script src="js/themes.js"></script>
+  <script src="js/matrix.js"></script>
+  <script src="js/extras.js"></script>
+  <script src="js/boot.js"></script>
+  <script src="js/konami.js"></script>
+  <script src="js/idle.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

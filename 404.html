@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Not Found</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      background: #0a0a0a;
+      color: #4af626;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+      font-size: 15px;
+      line-height: 1.6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+      padding: 40px;
+    }
+    .code {
+      font-size: 72px;
+      font-weight: 700;
+      text-shadow: 0 0 20px rgba(74, 246, 38, 0.5);
+      margin-bottom: 16px;
+    }
+    .message {
+      color: #3a7a3a;
+      margin-bottom: 24px;
+    }
+    .error-output {
+      text-align: left;
+      margin-bottom: 32px;
+      color: #ff4444;
+    }
+    a {
+      color: #00d4ff;
+      text-decoration: none;
+      border: 1px solid #00d4ff;
+      padding: 8px 24px;
+      border-radius: 4px;
+      display: inline-block;
+      transition: background 0.15s;
+    }
+    a:hover {
+      background: rgba(0, 212, 255, 0.1);
+    }
+    .prompt {
+      color: #4af626;
+      font-weight: 700;
+    }
+    .dim { color: #3a7a3a; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="code">404</div>
+    <div class="error-output">
+      <span class="prompt">visitor@dave:~$</span> <span style="color:#fff">cd /this-page</span><br>
+      <span style="color:#ff4444">bash: cd: /this-page: No such file or directory</span>
+    </div>
+    <p class="message">The page you're looking for doesn't exist.<br>It was probably rm'd without a backup.</p>
+    <a href="/">cd /home</a>
+  </div>
+</body>
+</html>

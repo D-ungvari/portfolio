@@ -1,0 +1,65 @@
+/* Text glow on primary text */
+#output .output-line:not(.error):not(.dim):not(.accent) {
+  text-shadow: 0 0 5px var(--color-glow);
+}
+
+.prompt {
+  text-shadow: 0 0 5px var(--color-glow);
+}
+
+/* Blinking cursor */
+.cursor {
+  color: var(--color-primary);
+  animation: blink 1.06s step-end infinite;
+}
+
+.cursor.typing {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Scanlines overlay */
+#terminal-body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  z-index: 1000;
+}
+
+/* Boot sequence typing effect */
+.boot-line {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  #terminal-body::before {
+    display: none;
+  }
+
+  .boot-line {
+    animation: none;
+  }
+}
