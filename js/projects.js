@@ -6,6 +6,7 @@ var projects = [
     command: '/uxcrimes',
     title: 'UXCRIMES',
     tagline: 'An interactive browser game about dark UX patterns',
+    category: 'game',
     description: [
       'Each level puts you face-to-face with a',
       'different manipulative UX pattern. 20 levels',
@@ -21,6 +22,7 @@ var projects = [
     command: '/horde',
     title: 'HORDE SHOOTER',
     tagline: 'A roguelike survival shooter — survive the onslaught',
+    category: 'game',
     description: [
       'Defend against waves of increasingly difficult',
       'enemies. Level up to unlock weapons and abilities.',
@@ -36,6 +38,7 @@ var projects = [
     command: '/platformer',
     title: 'PLATFORM SHOOTER',
     tagline: 'An arcade platform shooter with waves of enemies',
+    category: 'game',
     description: [
       'A 2D arcade shooter on floating platforms.',
       'Mouse-aim and click to shoot. Multiple enemy',
@@ -46,24 +49,121 @@ var projects = [
     stack: 'html / css / javascript / canvas 2d',
     liveUrl: 'https://d-ungvari.github.io/platform-shooter/',
     sourceUrl: 'https://github.com/D-ungvari/platform-shooter'
+  },
+  {
+    command: '/portfolio',
+    title: 'PORTFOLIO TERMINAL',
+    tagline: 'This terminal — a developer portfolio as a CLI',
+    category: 'app',
+    description: [
+      'An interactive terminal-style portfolio site.',
+      'Built with zero dependencies — vanilla HTML,',
+      'CSS, and JavaScript. Features themes, easter',
+      'eggs, game overlays, tab completion, and a',
+      'full command system with 50+ commands.'
+    ],
+    stack: 'html / css / javascript',
+    liveUrl: 'https://d-ungvari.github.io/portfolio/',
+    sourceUrl: 'https://github.com/D-ungvari/portfolio'
+  },
+  {
+    command: '/jobtracker',
+    title: 'JOBTRACKER',
+    tagline: 'AI-powered job application tracker with Kanban board',
+    category: 'app',
+    description: [
+      'A full-stack job application tracker with a',
+      'drag-and-drop Kanban board. AI-powered resume',
+      'parsing via Claude, semantic search with',
+      'pgvector, and .NET extraction pipeline.',
+      'Dockerized with CI/CD via GitHub Actions.'
+    ],
+    stack: 'next.js / .net 8 / postgresql / pgvector / claude api',
+    liveUrl: 'https://d-ungvari.github.io/JobTracker/',
+    sourceUrl: 'https://github.com/D-ungvari/JobTracker'
+  },
+  {
+    command: '/knowledgebase',
+    title: 'KNOWLEDGEBASE',
+    tagline: 'A personal wiki with RAG-powered semantic search',
+    category: 'app',
+    description: [
+      'A personal knowledge management wiki with',
+      'hybrid search — full-text and semantic via',
+      'pgvector embeddings. RAG pipeline for natural',
+      'language queries over your own notes.',
+      'Built with Next.js and PostgreSQL.'
+    ],
+    stack: 'next.js / postgresql / pgvector / rag',
+    liveUrl: 'https://d-ungvari.github.io/knowledgebase/',
+    sourceUrl: 'https://github.com/D-ungvari/knowledgebase'
   }
 ];
 
-// Register /projects list command
-registerCommand('/projects', 'list all projects', function(terminal) {
+// Helper to filter projects by category
+function getProjectsByCategory(category) {
+  var result = [];
+  for (var i = 0; i < projects.length; i++) {
+    if (projects[i].category === category) {
+      result.push(projects[i]);
+    }
+  }
+  return result;
+}
+
+// Helper to render a project list with optional category headers
+function renderProjectList(terminal, projectList, title, showCategories) {
   var lines = [
-    'projects:',
+    title,
     SEPARATOR,
     ''
   ];
 
-  for (var i = 0; i < projects.length; i++) {
-    var p = projects[i];
-    lines.push('  ' + p.command);
-    lines.push('  ' + p.tagline);
-    lines.push('  ' + p.stack);
-    if (i < projects.length - 1) {
+  if (showCategories) {
+    var apps = [];
+    var games = [];
+    for (var i = 0; i < projectList.length; i++) {
+      if (projectList[i].category === 'app') {
+        apps.push(projectList[i]);
+      } else {
+        games.push(projectList[i]);
+      }
+    }
+
+    if (apps.length > 0) {
+      lines.push('  APPS');
+      lines.push('  ' + '─'.repeat(32));
       lines.push('');
+      for (var a = 0; a < apps.length; a++) {
+        lines.push('  ' + apps[a].command);
+        lines.push('  ' + apps[a].tagline);
+        lines.push('  ' + apps[a].stack);
+        lines.push('');
+      }
+    }
+
+    if (games.length > 0) {
+      lines.push('  GAMES');
+      lines.push('  ' + '─'.repeat(32));
+      lines.push('');
+      for (var g = 0; g < games.length; g++) {
+        lines.push('  ' + games[g].command);
+        lines.push('  ' + games[g].tagline);
+        lines.push('  ' + games[g].stack);
+        if (g < games.length - 1) {
+          lines.push('');
+        }
+      }
+    }
+  } else {
+    for (var j = 0; j < projectList.length; j++) {
+      var p = projectList[j];
+      lines.push('  ' + p.command);
+      lines.push('  ' + p.tagline);
+      lines.push('  ' + p.stack);
+      if (j < projectList.length - 1) {
+        lines.push('');
+      }
     }
   }
 
@@ -74,6 +174,21 @@ registerCommand('/projects', 'list all projects', function(terminal) {
   lines.push('');
 
   terminal.outputLines(lines);
+}
+
+// Register /projects list command
+registerCommand('/projects', 'list all projects', function(terminal) {
+  renderProjectList(terminal, projects, 'projects:', true);
+});
+
+// Register /apps command — show only app-category projects
+registerCommand('/apps', 'list app projects', function(terminal) {
+  renderProjectList(terminal, getProjectsByCategory('app'), 'apps:', false);
+});
+
+// Register /games command — show only game projects
+registerCommand('/games', 'list game projects', function(terminal) {
+  renderProjectList(terminal, getProjectsByCategory('game'), 'games:', false);
 });
 
 // Auto-register each project as its own command

@@ -90,8 +90,8 @@ T.describe('/credits Command', function() {
 // ========================================
 
 T.describe('Final Project Inventory', function() {
-  T.it('3 projects with complete data', function() {
-    T.assertArrayLength(projects, 3);
+  T.it('6 projects with complete data', function() {
+    T.assertArrayLength(projects, 6);
     for (var i = 0; i < projects.length; i++) {
       T.assert(projects[i].command.length > 1, 'command too short');
       T.assert(projects[i].title.length > 0, 'title empty');

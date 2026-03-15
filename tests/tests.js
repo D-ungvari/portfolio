@@ -227,8 +227,8 @@ T.describe('Projects — Data Integrity', function() {
     T.assert(Array.isArray(projects), 'projects should be an array');
   });
 
-  T.it('has exactly 3 projects', function() {
-    T.assertArrayLength(projects, 3);
+  T.it('has exactly 6 projects', function() {
+    T.assertArrayLength(projects, 6);
   });
 
   T.it('each project has required fields', function() {

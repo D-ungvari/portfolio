@@ -125,4 +125,4 @@ registerCommand('/clear', 'clear terminal', function(terminal) {
 });
 
 // Builtin list for /help categorization
-var BUILTIN_COMMANDS = ['/projects', '/help', '/about', '/contact', '/clear', '/theme', '/history', '/skills'];
+var BUILTIN_COMMANDS = ['/projects', '/apps', '/games', '/help', '/about', '/experience', '/resume', '/contact', '/clear', '/theme', '/history', '/skills'];

@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
   registerAlias('/h', '/help');
   registerAlias('/p', '/projects');
   registerAlias('/cls', '/clear');
+  registerAlias('/exp', '/experience');
+  registerAlias('/cv', '/resume');
 
   // Wire command execution
   term.onCommand = function(rawInput) {

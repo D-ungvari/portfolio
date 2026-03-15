@@ -63,6 +63,64 @@ registerCommand('/skills', 'show tech skills', function(terminal) {
   terminal.output('');
 });
 
+// /experience — work experience display
+registerCommand('/experience', 'show work experience', function(terminal) {
+  terminal.outputLines([
+    'WORK EXPERIENCE',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    '  Full-Stack Developer — Omada A/S, Copenhagen',
+    '  2023 - Present',
+    '  • React/TypeScript frontend development',
+    '  • C#/.NET backend services',
+    '  • GraphQL API development',
+    '  • Agile team collaboration',
+    '',
+    '  EDUCATION',
+    '  ─────────────────────────────────',
+    '',
+    '  M.Sc. Information Science — Aalborg University',
+    '  Focus: Software Engineering',
+    '',
+    '  B.Tech Product Development — KEA Copenhagen',
+    '  Focus: IT & Electronics',
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    ''
+  ]);
+});
+
+// /resume — formatted terminal-style resume
+registerCommand('/resume', 'show terminal-style resume', function(terminal) {
+  terminal.outputLines([
+    'DAVE UNGVARI — Full-Stack Developer',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    '',
+    '  Copenhagen, Denmark',
+    '',
+    '  EXPERIENCE',
+    '  Full-Stack Developer — Omada A/S (2023 - Present)',
+    '  React, TypeScript, C#/.NET, GraphQL, SQL Server',
+    '',
+    '  SKILLS',
+    '  Frontend:  React, TypeScript, Next.js, Tailwind CSS',
+    '  Backend:   C#/.NET, Node.js, Express, GraphQL',
+    '  Database:  PostgreSQL, pgvector, SQL Server, Prisma',
+    '  DevOps:    Docker, GitHub Actions, Azure',
+    '  AI/ML:     Claude API, RAG, Embeddings',
+    '',
+    '  EDUCATION',
+    '  M.Sc. Information Science — Aalborg University',
+    '  B.Tech Product Development — KEA Copenhagen',
+    '',
+    '  PROJECTS',
+    '  Type /projects to see full project list.',
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
+    ''
+  ]);
+});
+
 // /stats — session statistics
 var sessionStartTime = Date.now();
 var commandCount = 0;
