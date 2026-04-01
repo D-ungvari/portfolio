@@ -51,6 +51,24 @@ var projects = [
     sourceUrl: 'https://github.com/D-ungvari/platform-shooter'
   },
   {
+    command: '/swarm',
+    title: 'SWARM COMMAND',
+    tagline: 'A StarCraft-inspired browser RTS — Terran vs Zerg',
+    category: 'game',
+    description: [
+      'Real-time strategy game built with TypeScript and',
+      'PixiJS v8. Hand-rolled ECS with TypedArrays for',
+      'cache-efficient simulation. 13 units with unique',
+      'abilities, damage types, upgrades, fog of war,',
+      'spatial hash queries, and adaptive AI with',
+      '4 difficulty levels and multi-prong attacks.',
+      '180 tests. 60 UPS fixed timestep, frame-rate input.'
+    ],
+    stack: 'typescript / pixijs v8 / vite / vitest / ecs',
+    liveUrl: 'https://d-ungvari.github.io/swarm-command/',
+    sourceUrl: 'https://github.com/D-ungvari/swarm-command'
+  },
+  {
     command: '/portfolio',
     title: 'PORTFOLIO TERMINAL',
     tagline: 'This terminal — a developer portfolio as a CLI',
