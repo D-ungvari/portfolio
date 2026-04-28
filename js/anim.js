@@ -41,18 +41,22 @@
     el = ensureEl(el);
     if (!el) return Promise.resolve();
     if (reduced() || !el.animate) {
-      // Apply final keyframe state instantly
-      var last = keyframes[keyframes.length - 1] || {};
-      for (var k in last) {
-        if (Object.prototype.hasOwnProperty.call(last, k) && k !== 'offset' && k !== 'easing') {
-          try { el.style[k] = last[k]; } catch (e) {}
-        }
-      }
+      // Reduced-motion: skip animation. Don't write any inline styles —
+      // doing so would clobber positional transforms set by window-manager.
       return Promise.resolve();
     }
     var a = el.animate(keyframes, options);
     return new Promise(function (resolve) {
-      a.addEventListener('finish', function () { resolve(); });
+      a.addEventListener('finish', function () {
+        // Commit only opacity post-effects to inline style; never transform —
+        // committing transform clobbers translate3d() positioning on windows.
+        try {
+          var last = keyframes[keyframes.length - 1] || {};
+          if (last.opacity != null) el.style.opacity = last.opacity;
+        } catch (e) {}
+        try { a.cancel(); } catch (e) {}
+        resolve();
+      });
       a.addEventListener('cancel', function () { resolve(); });
     });
   }
