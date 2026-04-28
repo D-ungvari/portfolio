@@ -1,0 +1,54 @@
+/* Sleep mode lock screen — Sprint B Phase 7 (B35c) */
+
+#sleep-lock {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 9700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease-in;
+  cursor: default;
+}
+#sleep-lock.visible { opacity: 1; }
+#sleep-lock.no-fade { transition: none; }
+
+#sleep-content {
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-primary);
+  text-shadow: 0 0 12px var(--color-glow);
+}
+
+#sleep-clock {
+  font-size: 86px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 24px;
+}
+
+#sleep-hint {
+  font-size: 13px;
+  color: var(--color-dim);
+  letter-spacing: 1px;
+  animation: sleep-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes sleep-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sleep-lock { transition: none; }
+  #sleep-hint { animation: none; }
+}
+
+@media (max-width: 639px) {
+  #sleep-clock { font-size: 56px; }
+}

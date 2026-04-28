@@ -1,0 +1,349 @@
+/* ==========================================================================
+   Window Manager — draggable, resizable, z-stacked windows.
+   Phase B2 of DavOS v3.
+   ========================================================================== */
+
+#window-layer {
+  position: fixed;
+  top: var(--taskbar-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 4000;
+}
+
+.os-window {
+  position: absolute;
+  pointer-events: auto;
+  --win-x: 64px;
+  --win-y: 64px;
+  --win-w: 800px;
+  --win-h: 600px;
+  width: var(--win-w);
+  height: var(--win-h);
+  transform: translate3d(var(--win-x), var(--win-y), 0);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  /* Layered shadow ramp for compositor-style depth */
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.5),
+    0 12px 32px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 0.18s, border-color 0.18s, opacity 0.18s, filter 0.18s;
+  opacity: 0.97;
+}
+
+.os-window.active {
+  border-color: var(--color-primary);
+  opacity: 1;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 6px 18px rgba(0, 0, 0, 0.6),
+    0 20px 56px rgba(0, 0, 0, 0.7),
+    0 0 0 1px var(--color-primary),
+    0 0 40px var(--color-glow);
+}
+
+.os-window:not(.active) {
+  filter: saturate(0.85) brightness(0.96);
+}
+.os-window:not(.active) .os-window-btn {
+  filter: grayscale(0.7) brightness(0.7);
+}
+
+.os-window.minimized { display: none; }
+
+.os-window.maximized {
+  --win-x: 0px !important;
+  --win-y: 0px !important;
+  width: 100vw !important;
+  height: calc(100vh - var(--taskbar-height)) !important;
+  border-radius: 0;
+}
+
+.os-window-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 30px;
+  padding: 0 12px;
+  background: rgba(10, 10, 10, 0.94);
+  border-bottom: 1px solid var(--color-border);
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.os-window.active .os-window-titlebar {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.os-window-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.os-window-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 0;
+  padding: 0;
+  transition: filter 0.12s;
+}
+.os-window-btn.close { background: #ff5f57; }
+.os-window-btn.min { background: #febc2e; }
+.os-window-btn.max { background: #28c840; }
+.os-window-btn:hover { filter: brightness(1.2); }
+.os-window-btn:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.os-window-title {
+  color: var(--color-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 1px;
+  flex: 1;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.os-window.active .os-window-title { color: var(--color-primary); }
+
+/* Menubar (native apps only) */
+.os-window-menubar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 26px;
+  padding: 0 4px;
+  background: rgba(10, 10, 10, 0.84);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+.os-window-menu-item {
+  background: transparent;
+  border: none;
+  color: var(--color-dim);
+  padding: 4px 10px;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 3px;
+  transition: background 0.12s, color 0.12s;
+}
+.os-window-menu-item:hover,
+.os-window-menu-item:focus-visible {
+  background: rgba(74, 246, 38, 0.12);
+  color: var(--color-primary);
+  outline: none;
+}
+.os-window.active .os-window-menu-item { color: var(--color-primary); }
+
+.os-window-menu-dropdown {
+  min-width: 180px;
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 4px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  animation: anim-slide-down 140ms var(--ease-out-emphasized);
+}
+.os-window-menu-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  padding: 5px 14px;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.os-window-menu-row:hover { background: rgba(74, 246, 38, 0.12); }
+.os-window-menu-row.disabled {
+  color: var(--color-dim);
+  cursor: not-allowed;
+}
+.os-window-menu-shortcut {
+  color: var(--color-dim);
+  margin-left: 24px;
+  font-size: 11px;
+}
+.os-window-menu-sep {
+  height: 1px;
+  background: var(--color-border);
+  margin: 4px 0;
+}
+
+/* Status bar (native apps only) */
+.os-window-statusbar {
+  height: 22px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  background: rgba(10, 10, 10, 0.84);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  flex-shrink: 0;
+  user-select: none;
+}
+.os-window.active .os-window-statusbar { color: var(--color-primary); }
+
+.os-window-body {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.os-window-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--color-bg);
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.os-window-iframe.loaded { opacity: 1; }
+
+.os-window-content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  color: var(--color-primary);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.os-window-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.os-window-loading.hidden { opacity: 0; }
+
+/* Resize handles ------------------------------------------------------------ */
+.os-window-resize { position: absolute; }
+.os-window-resize.n { top: 0; left: 8px; right: 8px; height: 4px; cursor: n-resize; }
+.os-window-resize.s { bottom: 0; left: 8px; right: 8px; height: 4px; cursor: s-resize; }
+.os-window-resize.e { top: 8px; bottom: 8px; right: 0; width: 4px; cursor: e-resize; }
+.os-window-resize.w { top: 8px; bottom: 8px; left: 0; width: 4px; cursor: w-resize; }
+.os-window-resize.ne { top: 0; right: 0; width: 8px; height: 8px; cursor: ne-resize; }
+.os-window-resize.nw { top: 0; left: 0; width: 8px; height: 8px; cursor: nw-resize; }
+.os-window-resize.se { bottom: 0; right: 0; width: 8px; height: 8px; cursor: se-resize; }
+.os-window-resize.sw { bottom: 0; left: 0; width: 8px; height: 8px; cursor: sw-resize; }
+
+.os-window.dragging,
+.os-window.resizing {
+  transition: none;
+  user-select: none;
+}
+.os-window.dragging .os-window-iframe,
+.os-window.resizing .os-window-iframe {
+  pointer-events: none;
+}
+
+/* Snap preview overlay ------------------------------------------------------ */
+.snap-preview {
+  position: fixed;
+  top: var(--taskbar-height);
+  left: 0;
+  width: 0;
+  height: 0;
+  background: rgba(74, 246, 38, 0.12);
+  border: 2px solid var(--color-primary);
+  pointer-events: none;
+  z-index: 4500;
+  transition: all 0.12s ease-out;
+  display: none;
+}
+.snap-preview.show { display: block; }
+
+/* Mobile: full viewport, no resize, simple title bar ------------------------ */
+@media (max-width: 639px) {
+  .os-window {
+    --win-x: 0px;
+    --win-y: 0px;
+    width: 100vw !important;
+    height: calc(100vh - var(--taskbar-height)) !important;
+    border-radius: 0;
+    border: none;
+  }
+  .os-window-resize { display: none; }
+  .os-window-titlebar { cursor: default; }
+  .snap-preview { display: none !important; }
+}
+
+/* Taskbar running-apps strip (B07) ----------------------------------------- */
+#taskbar-running {
+  display: flex;
+  gap: 4px;
+  margin-left: 16px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#taskbar-running::-webkit-scrollbar { display: none; }
+
+.taskbar-app {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-dim);
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.taskbar-app:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.taskbar-app.active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+}
+.taskbar-app.minimized {
+  color: var(--color-dim);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-window,
+  .os-window-iframe,
+  .snap-preview { transition: none; }
+}

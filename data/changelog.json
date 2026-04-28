@@ -1,0 +1,15 @@
+{
+  "entries": [
+    { "version": "v1.4.0", "date": "2026-04", "type": "feat",     "msg": "ship DavOS v3 portfolio (windows + apps + persona)" },
+    { "version": "v1.3.4", "date": "2026-03", "type": "feat",     "msg": "ship DavOS v2 portfolio (OS desktop + terminal pane)" },
+    { "version": "v1.3.3", "date": "2026-02", "type": "feat",     "msg": "swarm-command RTS — 13 units, fog of war, adaptive AI" },
+    { "version": "v1.3.2", "date": "2026-01", "type": "feat",     "msg": "knowledgebase — RAG + hybrid search wiki" },
+    { "version": "v1.3.1", "date": "2025-11", "type": "feat",     "msg": "jobtracker — Claude API + pgvector + .NET extraction" },
+    { "version": "v1.3.0", "date": "2025-08", "type": "refactor", "msg": "platform-shooter + horde-shooter — vanilla canvas games" },
+    { "version": "v1.2.0", "date": "2024-09", "type": "feat",     "msg": "uxcrimes — 20 levels of dark UX patterns" },
+    { "version": "v1.1.0", "date": "2023-08", "type": "feat",     "msg": "joined Omada A/S — full-stack on identity governance" },
+    { "version": "v1.0.0", "date": "2022-06", "type": "feat",     "msg": "shipped M.Sc. Information Science — Aalborg University" },
+    { "version": "v0.5.0", "date": "2018-06", "type": "feat",     "msg": "shipped B.Tech Product Development — KEA Copenhagen" },
+    { "version": "v0.0.1", "date": "1995",    "type": "init",     "msg": "initial commit" }
+  ]
+}

@@ -7,6 +7,7 @@ var projects = [
     title: 'UXCRIMES',
     tagline: 'An interactive browser game about dark UX patterns',
     category: 'game',
+    glyph: '[!]',
     description: [
       'Each level puts you face-to-face with a',
       'different manipulative UX pattern. 20 levels',
@@ -23,6 +24,7 @@ var projects = [
     title: 'HORDE SHOOTER',
     tagline: 'A roguelike survival shooter — survive the onslaught',
     category: 'game',
+    glyph: '▼▼',
     description: [
       'Defend against waves of increasingly difficult',
       'enemies. Level up to unlock weapons and abilities.',
@@ -39,6 +41,7 @@ var projects = [
     title: 'PLATFORM SHOOTER',
     tagline: 'An arcade platform shooter with waves of enemies',
     category: 'game',
+    glyph: '◇■',
     description: [
       'A 2D arcade shooter on floating platforms.',
       'Mouse-aim and click to shoot. Multiple enemy',
@@ -55,6 +58,7 @@ var projects = [
     title: 'SWARM COMMAND',
     tagline: 'A StarCraft-inspired browser RTS — Terran vs Zerg',
     category: 'game',
+    glyph: ':::',
     description: [
       'Real-time strategy game built with TypeScript and',
       'PixiJS v8. Hand-rolled ECS with TypedArrays for',
@@ -73,6 +77,7 @@ var projects = [
     title: 'PORTFOLIO TERMINAL',
     tagline: 'This terminal — a developer portfolio as a CLI',
     category: 'app',
+    glyph: '□',
     description: [
       'An interactive terminal-style portfolio site.',
       'Built with zero dependencies — vanilla HTML,',
@@ -89,6 +94,7 @@ var projects = [
     title: 'JOBTRACKER',
     tagline: 'AI-powered job application tracker with Kanban board',
     category: 'app',
+    glyph: '▤',
     description: [
       'A full-stack job application tracker with a',
       'drag-and-drop Kanban board. AI-powered resume',
@@ -105,6 +111,7 @@ var projects = [
     title: 'KNOWLEDGEBASE',
     tagline: 'A personal wiki with RAG-powered semantic search',
     category: 'app',
+    glyph: '⌬',
     description: [
       'A personal knowledge management wiki with',
       'hybrid search — full-text and semantic via',

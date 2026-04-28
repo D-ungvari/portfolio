@@ -1,0 +1,139 @@
+/* Quick Settings panel — top-right popout */
+
+#taskbar-quick-settings {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  width: 26px;
+  height: 24px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, border-color 0.12s;
+}
+#taskbar-quick-settings:hover {
+  background: rgba(74, 246, 38, 0.08);
+  border-color: var(--color-primary);
+}
+
+.quick-settings {
+  position: fixed;
+  width: 320px;
+  z-index: var(--layer-popouts, 4000);
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7), 0 0 16px var(--color-glow);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--color-primary);
+  backdrop-filter: blur(8px);
+}
+
+.qs-section {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.qs-section:last-of-type { border-bottom: none; }
+
+.qs-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--color-dim);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.qs-themes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+.qs-theme {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-dim);
+  padding: 6px;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 3px;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.qs-theme:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.qs-theme.active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.1);
+  box-shadow: 0 0 8px var(--color-glow);
+}
+
+.qs-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.qs-toggle input { cursor: pointer; }
+
+.qs-slider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.qs-segmented {
+  display: flex;
+  gap: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
+  padding: 2px;
+}
+.qs-segmented button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--color-dim);
+  padding: 5px;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 2px;
+  transition: color 0.12s, background 0.12s;
+}
+.qs-segmented button.active,
+.qs-segmented button:hover {
+  color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.1);
+}
+
+.qs-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  margin-top: 10px;
+}
+.qs-action {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-dim);
+  padding: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  border-radius: 3px;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.qs-action:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.06);
+}

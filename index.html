@@ -14,38 +14,96 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/anim.css">
+  <link rel="stylesheet" href="css/cursors.css">
+  <link rel="stylesheet" href="css/os-shell.css">
+  <link rel="stylesheet" href="css/boot.css">
+  <link rel="stylesheet" href="css/desktop.css">
+  <link rel="stylesheet" href="css/taskbar.css">
   <link rel="stylesheet" href="css/terminal.css">
   <link rel="stylesheet" href="css/effects.css">
   <link rel="stylesheet" href="css/mobile.css">
   <link rel="stylesheet" href="css/game-overlay.css">
+  <link rel="stylesheet" href="css/notify.css">
+  <link rel="stylesheet" href="css/window-manager.css">
+  <link rel="stylesheet" href="css/palette.css">
+  <link rel="stylesheet" href="css/cheatsheet.css">
+  <link rel="stylesheet" href="css/launcher.css">
+  <link rel="stylesheet" href="css/tray-popouts.css">
+  <link rel="stylesheet" href="css/quick-settings.css">
+  <link rel="stylesheet" href="css/lock-screen.css">
+  <link rel="stylesheet" href="css/login-screen.css">
+  <link rel="stylesheet" href="css/widgets.css">
+  <link rel="stylesheet" href="css/files-app.css">
+  <link rel="stylesheet" href="css/apps.css">
+  <link rel="stylesheet" href="css/terminal-tabs.css">
+  <link rel="stylesheet" href="css/sleep.css">
 </head>
-<body>
-  <div id="terminal" role="application" aria-label="Interactive terminal portfolio">
-    <div id="terminal-bar">
-      <span class="bar-dot red"></span>
-      <span class="bar-dot yellow"></span>
-      <span class="bar-dot green"></span>
-      <span class="bar-title">visitor@dave ~ /portfolio</span>
-    </div>
-    <div id="terminal-body" aria-live="polite" aria-relevant="additions">
-      <div id="output"></div>
-      <div id="input-line">
-        <span class="prompt">visitor@dave:~$&nbsp;</span>
-        <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
-        <input type="text" id="command-input"
-               autofocus autocomplete="off"
-               spellcheck="false" autocapitalize="off"
-               aria-label="Terminal command input">
+<body data-active-pane="desktop">
+  <div id="os-shell">
+    <header id="taskbar" role="banner">
+      <span id="taskbar-os-label">DavOS 1.0</span>
+      <span id="taskbar-workspace">─ workspace 1 ─</span>
+      <div id="taskbar-running" role="toolbar" aria-label="Running applications"></div>
+      <div id="taskbar-right">
+        <span id="taskbar-clock" aria-live="off">--:--</span>
       </div>
+    </header>
+    <main id="os-main" role="main">
+      <section id="desktop-pane" role="application" aria-label="Project desktop" tabindex="0">
+        <div id="desktop-wallpaper">
+          <div id="icon-grid" role="grid" aria-label="Project icons"></div>
+          <div id="trash-icon" role="button" aria-label="Trash" tabindex="0"><pre class="trash-art" aria-hidden="true">⌐──┐
+│░░│
+└──┘</pre></div>
+        </div>
+      </section>
+      <div id="pane-divider" role="separator" aria-orientation="vertical" tabindex="0"></div>
+      <section id="terminal-pane" class="terminal-pane">
+        <div id="terminal" role="application" aria-label="Interactive terminal portfolio">
+          <div id="terminal-bar">
+            <span class="bar-dot red"></span>
+            <span class="bar-dot yellow"></span>
+            <span class="bar-dot green"></span>
+            <span class="bar-title">visitor@dave ~ /portfolio</span>
+          </div>
+          <div id="terminal-body" aria-live="polite" aria-relevant="additions">
+            <div id="output"></div>
+            <div id="input-line">
+              <span class="prompt">visitor@dave:~$&nbsp;</span>
+              <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
+              <input type="text" id="command-input"
+                     autofocus autocomplete="off"
+                     spellcheck="false" autocapitalize="off"
+                     aria-label="Terminal command input">
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <nav id="mobile-commands" aria-label="Quick commands">
+      <button type="button" data-cmd="/help">/help</button>
+      <button type="button" data-cmd="/projects">/projects</button>
+      <button type="button" data-cmd="/about">/about</button>
+      <button type="button" data-cmd="/contact">/contact</button>
+    </nav>
+    <div id="pane-toggle" role="tablist" aria-label="Pane selector">
+      <button data-pane="desktop" role="tab" aria-selected="true">DESKTOP</button>
+      <button data-pane="terminal" role="tab" aria-selected="false">TERMINAL</button>
     </div>
   </div>
-  <nav id="mobile-commands" aria-label="Quick commands">
-    <button data-cmd="/help">/help</button>
-    <button data-cmd="/projects">/projects</button>
-    <button data-cmd="/about">/about</button>
-    <button data-cmd="/contact">/contact</button>
-  </nav>
 
+  <script src="js/anim.js"></script>
+  <script src="js/desktop-layer.js"></script>
+  <script src="js/persona-data.js"></script>
+  <script src="js/persona.js"></script>
+  <script src="js/session-store.js"></script>
+  <script src="js/notify.js"></script>
+  <script src="js/shortcuts.js"></script>
+  <script src="js/window-manager.js"></script>
+  <script src="js/palette.js"></script>
+  <script src="js/shortcuts-cheatsheet.js"></script>
   <script src="js/terminal.js"></script>
   <script src="js/commands.js"></script>
   <script src="js/projects.js"></script>
@@ -54,6 +112,32 @@
   <script src="js/themes.js"></script>
   <script src="js/matrix.js"></script>
   <script src="js/extras.js"></script>
+  <script src="js/icon.js"></script>
+  <script src="js/desktop.js"></script>
+  <script src="js/context-menu.js"></script>
+  <script src="js/taskbar.js"></script>
+  <script src="js/pinned-apps.js"></script>
+  <script src="js/launcher.js"></script>
+  <script src="js/tray-popouts.js"></script>
+  <script src="js/quick-settings.js"></script>
+  <script src="js/lock-screen.js"></script>
+  <script src="js/login-screen.js"></script>
+  <script src="js/widgets.js"></script>
+  <script src="js/parallax.js"></script>
+  <script src="js/lasso.js"></script>
+  <script src="js/os-commands.js"></script>
+  <script src="js/apps/settings.js"></script>
+  <script src="js/apps/mail.js"></script>
+  <script src="js/apps/cv-viewer.js"></script>
+  <script src="js/apps/apps-grid.js"></script>
+  <script src="js/apps/boring-view.js"></script>
+  <script src="js/apps/files.js"></script>
+  <script src="js/app-commands.js"></script>
+  <script src="js/lore.js"></script>
+  <script src="js/fs.js"></script>
+  <script src="js/terminal-tabs.js"></script>
+  <script src="js/pane-toggle.js"></script>
+  <script src="js/splitter.js"></script>
   <script src="js/boot.js"></script>
   <script src="js/konami.js"></script>
   <script src="js/idle.js"></script>

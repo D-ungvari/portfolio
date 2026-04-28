@@ -1,0 +1,165 @@
+/* Tray popouts: calendar, volume, network, battery */
+
+.tray-popout {
+  position: fixed;
+  z-index: var(--layer-popouts, 4000);
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 14px;
+  min-width: 240px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--color-primary);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.7), 0 0 16px var(--color-glow);
+  backdrop-filter: blur(8px);
+}
+
+.tray-popout .popout-title {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--color-dim);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.tray-popout .popout-btn {
+  margin-top: 10px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  padding: 6px 14px;
+  cursor: pointer;
+  font: inherit;
+  border-radius: 3px;
+  width: 100%;
+}
+.tray-popout .popout-btn:hover {
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+}
+.tray-popout .popout-btn[disabled] {
+  cursor: not-allowed;
+  color: var(--color-dim);
+  border-color: var(--color-border);
+  background: transparent;
+}
+
+/* Calendar */
+.calendar-popout { width: 280px; padding: 16px; }
+.calendar-header {
+  text-align: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+.calendar-time {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-shadow: 0 0 8px var(--color-glow);
+  font-variant-numeric: tabular-nums;
+}
+.calendar-date {
+  font-size: 11px;
+  color: var(--color-dim);
+  margin-top: 4px;
+}
+.calendar-nav {
+  font-size: 12px;
+  color: var(--color-primary);
+  text-align: center;
+  padding: 4px 0 8px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+.calendar-dow {
+  text-align: center;
+  font-size: 10px;
+  color: var(--color-dim);
+  padding: 4px 0;
+}
+.calendar-day {
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 0;
+  color: var(--color-primary);
+  border-radius: 3px;
+}
+.calendar-day.blank { color: transparent; }
+.calendar-day.today {
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-weight: 700;
+  box-shadow: 0 0 8px var(--color-glow);
+}
+.calendar-foot {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-border);
+  font-size: 10px;
+  color: var(--color-dim);
+  text-align: center;
+}
+
+/* Volume */
+.volume-popout { width: 200px; }
+.vol-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  margin: 8px 0;
+  justify-content: center;
+}
+.vol-cell {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-dim);
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 2px;
+  transition: color 0.12s, border-color 0.12s;
+}
+.vol-cell.on {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  text-shadow: 0 0 6px var(--color-glow);
+}
+.vol-label {
+  font-size: 10px;
+  color: var(--color-dim);
+  text-align: center;
+}
+
+/* Network */
+.network-popout .net-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.network-popout .ok { color: var(--color-primary); }
+
+/* Battery */
+.battery-popout .bat-pct {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-shadow: 0 0 8px var(--color-glow);
+  text-align: center;
+  margin: 8px 0;
+}
+.battery-popout .bat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 11px;
+  color: var(--color-dim);
+}
+.battery-popout .bat-row span { color: var(--color-primary); }

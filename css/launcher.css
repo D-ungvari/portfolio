@@ -1,0 +1,107 @@
+/* Launcher — start menu popout for DavOS v4 */
+
+.launcher {
+  position: fixed;
+  width: 340px;
+  max-height: 460px;
+  z-index: var(--layer-popouts, 4000);
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 24px var(--color-glow);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.launcher-header {
+  padding: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.launcher-search {
+  width: 100%;
+  background: var(--color-chip-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  outline: none;
+}
+.launcher-search:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-glow);
+}
+.launcher-search::placeholder { color: var(--color-dim); }
+
+.launcher-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 0;
+  min-height: 240px;
+}
+
+.launcher-group-header {
+  padding: 8px 12px 4px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--color-dim);
+  text-transform: uppercase;
+}
+
+.launcher-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  padding: 6px 14px;
+  cursor: pointer;
+  font: inherit;
+}
+.launcher-item:hover,
+.launcher-item.selected {
+  background: rgba(74, 246, 38, 0.12);
+}
+.launcher-item-name { font-size: 13px; }
+.launcher-item-hint { font-size: 11px; color: var(--color-dim); }
+
+.launcher-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--color-dim);
+  font-size: 12px;
+}
+
+.launcher-footer {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid var(--color-border);
+  background: rgba(10, 10, 10, 0.6);
+}
+.launcher-quick {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-dim);
+  padding: 5px 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  border-radius: 3px;
+  transition: color 0.12s, border-color 0.12s, background 0.12s;
+}
+.launcher-quick:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.06);
+}

@@ -63,6 +63,13 @@ Terminal.prototype._bindEvents = function() {
   });
 };
 
+Terminal.prototype.submit = function(cmd) {
+  if (typeof cmd !== 'string') return;
+  this.inputEl.value = cmd;
+  this.inputDisplay.textContent = cmd;
+  this._processCommand();
+};
+
 Terminal.prototype._processCommand = function() {
   var raw = this.inputEl.value;
 

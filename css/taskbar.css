@@ -1,0 +1,250 @@
+#taskbar-os-label {
+  position: relative;
+  padding: 4px 8px;
+  border-radius: 3px;
+  transition: background 0.12s;
+}
+#taskbar-os-label:hover {
+  background: rgba(74, 246, 38, 0.1);
+}
+
+/* Theme dropdown trigger */
+#taskbar-theme-btn {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+#taskbar-theme-btn:hover {
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+}
+
+/* Theme dropdown menu */
+.taskbar-menu {
+  position: fixed;
+  z-index: 7500;
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 4px 0;
+  min-width: 140px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+}
+.taskbar-menu-item {
+  padding: 6px 14px;
+  color: var(--color-primary);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.taskbar-menu-item:hover {
+  background: rgba(74, 246, 38, 0.12);
+}
+.taskbar-menu-item .check {
+  color: var(--color-accent);
+  visibility: hidden;
+}
+.taskbar-menu-item.active .check {
+  visibility: visible;
+}
+
+/* About panel (modal) */
+.about-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: about-fade 0.18s ease-out;
+}
+@keyframes about-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.about-panel {
+  background: var(--color-bg);
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  padding: 28px 32px;
+  max-width: 520px;
+  width: calc(100% - 32px);
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-primary);
+  box-shadow: 0 0 32px var(--color-glow);
+  position: relative;
+}
+.about-panel h2 {
+  font-size: 18px;
+  margin: 0 0 4px;
+  letter-spacing: 1px;
+}
+.about-panel .about-subtitle {
+  color: var(--color-dim);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+.about-panel .about-section {
+  margin-bottom: 16px;
+}
+.about-panel .about-section h3 {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--color-dim);
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.about-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.about-panel li {
+  font-size: 13px;
+  padding: 2px 0;
+  color: var(--color-primary);
+}
+.about-panel li.dim { color: var(--color-dim); }
+.about-panel a { color: var(--color-accent); }
+.about-panel .about-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--color-dim);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 2px 8px;
+}
+.about-panel .about-close:hover { color: var(--color-primary); }
+
+/* BSOD overlay for /shutdown */
+#bsod-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0000aa;
+  color: #ffffff;
+  font-family: 'Lucida Console', 'JetBrains Mono', monospace;
+  z-index: 9500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+#bsod-overlay .bsod-content {
+  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.6;
+  text-align: left;
+}
+#bsod-overlay .bsod-title {
+  background: #ffffff;
+  color: #0000aa;
+  padding: 4px 12px;
+  display: inline-block;
+  margin-bottom: 24px;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-overlay { animation: none; }
+}
+
+/* Pinned apps strip — quick-launch icons */
+#taskbar-pinned {
+  display: flex;
+  gap: 2px;
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid var(--color-border);
+}
+.taskbar-pinned-app {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-dim);
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 0.12s, border-color 0.12s, background 0.12s, transform 0.12s;
+  padding: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+.taskbar-pinned-app:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+  transform: translateY(-1px);
+}
+.taskbar-pinned-app:active { transform: translateY(0); }
+.taskbar-pinned-app .pinned-glyph {
+  font-size: 13px;
+  line-height: 1;
+}
+@media (max-width: 639px) {
+  #taskbar-pinned { display: none; }
+}
+
+/* System tray cluster — net rate / volume / battery / EQ */
+#taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--color-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+.tray-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.tray-vol { letter-spacing: 1px; }
+.tray-eq {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 12px;
+}
+.tray-eq .bar {
+  display: block;
+  width: 2px;
+  height: 4px;
+  background: var(--color-primary);
+  animation: eq-bar 1s infinite ease-in-out;
+}
+.tray-eq .bar:nth-child(1) { animation-delay: 0s;     animation-duration: 0.8s; }
+.tray-eq .bar:nth-child(2) { animation-delay: 0.15s;  animation-duration: 1.1s; }
+.tray-eq .bar:nth-child(3) { animation-delay: 0.05s;  animation-duration: 0.9s; }
+.tray-eq .bar:nth-child(4) { animation-delay: 0.22s;  animation-duration: 1.2s; }
+.tray-eq .bar:nth-child(5) { animation-delay: 0.1s;   animation-duration: 0.7s; }
+.tray-eq .bar:nth-child(6) { animation-delay: 0.18s;  animation-duration: 1.0s; }
+@keyframes eq-bar {
+  0%, 100% { height: 3px; }
+  50%      { height: 11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tray-eq .bar { animation: none; height: 6px; }
+}
+@media (max-width: 639px) {
+  #taskbar-tray .tray-net,
+  #taskbar-tray .tray-bat,
+  #taskbar-tray .tray-vol,
+  #taskbar-tray .tray-eq { display: none; }
+}

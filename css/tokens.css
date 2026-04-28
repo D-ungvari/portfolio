@@ -1,0 +1,25 @@
+/* Design tokens — theme-agnostic CSS custom properties.
+   Loaded after reset.css and before all component stylesheets.
+   Themes (green / amber / blue / matrix) re-skin via --color-* overrides. */
+
+:root {
+  /* Color tokens — green theme defaults */
+  --color-bg: #0a0a0a;
+  --color-primary: #4af626;
+  --color-dim: #3a7a3a;
+  --color-error: #ff4444;
+  --color-input: #ffffff;
+  --color-accent: #00d4ff;
+  --color-glow: rgba(74, 246, 38, 0.3);
+  --color-scrollbar: #1a3a1a;
+  --color-border: #2a4a2a;
+  --color-chip-bg: #1a1a1a;
+  --color-primary-bg-soft: rgba(74, 246, 38, 0.08);
+  --color-primary-bg-softer: rgba(74, 246, 38, 0.02);
+  --wallpaper-overlay: repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(74, 246, 38, 0.04) 3px, rgba(74, 246, 38, 0.04) 4px);
+
+  /* Layout tokens — OS shell */
+  --terminal-width: 40%;
+  --taskbar-height: 32px;
+  --divider-width: 4px;
+}

@@ -1,0 +1,140 @@
+/* Lock screen + dim phase — DavOS v4 C3.3 */
+
+#lock-dim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: var(--layer-lock-screen, 9000);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+}
+#lock-dim.visible { opacity: 1; }
+
+#lock-screen {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-lock-screen, 9000);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+#lock-screen.visible { opacity: 1; }
+
+#lock-screen .lock-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(74, 246, 38, 0.06), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0, transparent 3px, rgba(74, 246, 38, 0.03) 3px, rgba(74, 246, 38, 0.03) 4px);
+  pointer-events: none;
+}
+
+#lock-screen .lock-content {
+  position: relative;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-primary);
+  text-shadow: 0 0 8px var(--color-glow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-width: 360px;
+  padding: 32px;
+}
+
+#lock-screen .lock-clock {
+  font-size: 88px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+#lock-screen .lock-date {
+  font-size: 14px;
+  color: var(--color-dim);
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+
+#lock-screen .lock-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+#lock-screen .lock-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+  box-shadow: 0 0 24px var(--color-glow), inset 0 0 12px rgba(74, 246, 38, 0.1);
+}
+#lock-screen .lock-name {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+#lock-screen .lock-role {
+  font-size: 11px;
+  color: var(--color-dim);
+}
+
+#lock-screen .lock-input {
+  width: 240px;
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  padding: 8px 12px;
+  font-family: inherit;
+  font-size: 14px;
+  border-radius: 3px;
+  outline: none;
+  text-align: center;
+  letter-spacing: 4px;
+}
+#lock-screen .lock-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 8px var(--color-glow);
+}
+#lock-screen .lock-input::placeholder {
+  color: var(--color-dim);
+  letter-spacing: 1px;
+}
+
+#lock-screen .lock-hint {
+  font-size: 11px;
+  color: var(--color-dim);
+  letter-spacing: 1px;
+  margin-top: 8px;
+  animation: lock-pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes lock-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #lock-screen, #lock-dim { transition: none; }
+  #lock-screen .lock-hint { animation: none; }
+}
+
+@media (max-width: 639px) {
+  #lock-screen .lock-clock { font-size: 56px; }
+  #lock-screen .lock-avatar { width: 64px; height: 64px; font-size: 24px; }
+}

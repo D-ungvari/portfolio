@@ -1,47 +1,146 @@
 /**
- * Idle detection — triggers matrix rain after 5 minutes of inactivity.
+ * Idle / sleep mode — Sprint B Phase 7 (B35c).
+ *
+ * After 5 minutes of inactivity, dims the screen and shows a lock-screen
+ * clock. Any keypress, click, or touch wakes the OS.
+ *
+ * Replaces the previous matrix-rain idle behaviour.
  */
+(function () {
+  'use strict';
 
-(function() {
-  var IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-  var idleTimer = null;
-  var matrixRunning = false;
+  var DIM_MS = 5 * 60 * 1000;
+  var LOCK_MS = 10 * 60 * 1000;
+  var dimTimer = null;
+  var lockTimer = null;
+  var sleeping = false;
+  var lockEl = null;
+  var clockEl = null;
+  var clockUpdater = null;
 
-  function resetIdleTimer() {
-    if (matrixRunning) return;
-
-    clearTimeout(idleTimer);
-    idleTimer = setTimeout(onIdle, IDLE_TIMEOUT);
+  function reset() {
+    if (sleeping) return;
+    if (dimTimer) clearTimeout(dimTimer);
+    if (lockTimer) clearTimeout(lockTimer);
+    dimTimer = setTimeout(maybeDim, DIM_MS);
+    lockTimer = setTimeout(maybeSleep, LOCK_MS);
   }
 
-  function onIdle() {
-    // Don't trigger if game overlay is open
-    if (typeof GameOverlay !== 'undefined' && GameOverlay.isOpen()) return;
+  function maybeDim() {
+    if (sleeping) return;
+    if (typeof GameOverlay !== 'undefined' && GameOverlay.isOpen && GameOverlay.isOpen()) return;
+    if (window.LockScreen && LockScreen.startDim) LockScreen.startDim();
+  }
 
-    // Don't trigger if reduced motion is preferred
-    var prefersReducedMotion = window.matchMedia &&
+  function maybeSleep() {
+    if (typeof GameOverlay !== 'undefined' &&
+        GameOverlay.isOpen && GameOverlay.isOpen()) {
+      reset();
+      return;
+    }
+    if (window.LockScreen && LockScreen.lock) {
+      LockScreen.lock();
+      sleeping = true;
+      // When wake fires, re-arm — wake removes overlay; we hook to reset
+      var checkWake = setInterval(function () {
+        if (!LockScreen.isLocked()) {
+          sleeping = false;
+          clearInterval(checkWake);
+          reset();
+        }
+      }, 500);
+      return;
+    }
+    sleep();
+  }
+
+  function sleep() {
+    if (sleeping) return;
+    var prefersReduced = window.matchMedia &&
       window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
+    sleeping = true;
 
-    // Don't trigger if matrix rain function isn't available
-    if (typeof runMatrixRain !== 'function') return;
+    lockEl = document.createElement('div');
+    lockEl.id = 'sleep-lock';
+    lockEl.setAttribute('role', 'status');
+    lockEl.setAttribute('aria-label', 'System idle. Press any key to wake.');
 
-    matrixRunning = true;
-    runMatrixRain(6000);
+    var inner = document.createElement('div');
+    inner.id = 'sleep-content';
 
-    // Reset after matrix ends
-    setTimeout(function() {
-      matrixRunning = false;
-      resetIdleTimer();
-    }, 8000);
+    clockEl = document.createElement('div');
+    clockEl.id = 'sleep-clock';
+    inner.appendChild(clockEl);
+
+    var hint = document.createElement('div');
+    hint.id = 'sleep-hint';
+    hint.textContent = '[ press any key to wake ]';
+    inner.appendChild(hint);
+
+    lockEl.appendChild(inner);
+    document.body.appendChild(lockEl);
+
+    if (!prefersReduced) {
+      requestAnimationFrame(function () {
+        if (lockEl) lockEl.classList.add('visible');
+      });
+    } else {
+      lockEl.classList.add('visible', 'no-fade');
+    }
+
+    updateClock();
+    clockUpdater = setInterval(updateClock, 1000);
+
+    document.addEventListener('keydown', wake, true);
+    document.addEventListener('mousedown', wake, true);
+    document.addEventListener('touchstart', wake, true);
   }
 
-  // Track user activity
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function updateClock() {
+    if (!clockEl) return;
+    var d = new Date();
+    clockEl.textContent =
+      pad(d.getHours()) + ':' +
+      pad(d.getMinutes()) + ':' +
+      pad(d.getSeconds());
+  }
+
+  function wake() {
+    if (!sleeping) return;
+    sleeping = false;
+    document.removeEventListener('keydown', wake, true);
+    document.removeEventListener('mousedown', wake, true);
+    document.removeEventListener('touchstart', wake, true);
+
+    if (clockUpdater) {
+      clearInterval(clockUpdater);
+      clockUpdater = null;
+    }
+    if (lockEl) {
+      lockEl.classList.remove('visible');
+      var toRemove = lockEl;
+      setTimeout(function () {
+        if (toRemove.parentNode) toRemove.parentNode.removeChild(toRemove);
+      }, 350);
+      lockEl = null;
+      clockEl = null;
+    }
+    reset();
+  }
+
+  // Activity events that reset the timer
   var events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
   for (var i = 0; i < events.length; i++) {
-    document.addEventListener(events[i], resetIdleTimer, { passive: true });
+    document.addEventListener(events[i], reset, { passive: true });
   }
 
-  // Start the timer
-  resetIdleTimer();
+  reset();
+
+  window.SleepMode = {
+    sleep: function () { if (!sleeping) sleep(); },
+    wake: wake,
+    isSleeping: function () { return sleeping; }
+  };
 })();

@@ -1,0 +1,41 @@
+{
+  "interview": [
+    { "type": "say", "text": "→ Quick tour, ~60 seconds." },
+    { "type": "say", "text": "→ Three projects worth highlighting." },
+    { "type": "wait", "ms": 800 },
+    { "type": "run", "cmd": "/swarm" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "say", "text": "→ TypeScript + PixiJS RTS. 180 tests. Hand-rolled ECS." },
+    { "type": "wait", "ms": 1500 },
+    { "type": "run", "cmd": "/jobtracker" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "say", "text": "→ Full-stack AI: Claude API, pgvector, .NET extraction." },
+    { "type": "wait", "ms": 1500 },
+    { "type": "run", "cmd": "/knowledgebase" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "say", "text": "→ Hybrid RAG search, Next.js + Postgres." },
+    { "type": "wait", "ms": 1500 },
+    { "type": "say", "text": "→ Tour complete. Type /contact to start a conversation." }
+  ],
+  "demo": [
+    { "type": "say", "text": "[ DEMO MODE — input locked. press any key to exit. ]" },
+    { "type": "wait", "ms": 500 },
+    { "type": "theme", "name": "amber" },
+    { "type": "wait", "ms": 1000 },
+    { "type": "run", "cmd": "/about" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "theme", "name": "blue" },
+    { "type": "wait", "ms": 600 },
+    { "type": "run", "cmd": "/skills" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "theme", "name": "matrix" },
+    { "type": "wait", "ms": 600 },
+    { "type": "run", "cmd": "/projects" },
+    { "type": "wait", "ms": 2500 },
+    { "type": "theme", "name": "green" },
+    { "type": "wait", "ms": 800 },
+    { "type": "run", "cmd": "/contact" },
+    { "type": "wait", "ms": 1500 },
+    { "type": "say", "text": "→ End of demo." }
+  ]
+}

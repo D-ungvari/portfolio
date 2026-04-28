@@ -16,7 +16,9 @@ function readFile(filePath) {
 // Build the HTML with all scripts inline
 const htmlContent = readFile(path.join(basePath, 'tests', 'index.html'));
 
-// Create a JSDOM instance
+// Create a JSDOM instance.
+// Use a 1280x800 viewport so window.innerWidth >= the splitter's
+// 1024px desktop breakpoint — required for tests-os.js splitter tests.
 const dom = new JSDOM(htmlContent, {
   url: 'http://localhost',
   runScripts: 'dangerously',
@@ -26,16 +28,79 @@ const dom = new JSDOM(htmlContent, {
 
 const { window } = dom;
 
-// Load scripts in order
+// Force viewport >= 1024px for splitter desktop branch.
+try {
+  Object.defineProperty(window, 'innerWidth', { configurable: true, get: function() { return 1280; } });
+  Object.defineProperty(window, 'innerHeight', { configurable: true, get: function() { return 800; } });
+} catch (e) { /* ignore */ }
+
+// Mock prefers-reduced-motion BEFORE any app script runs so boot.js
+// takes the synchronous path. (The HTML also includes this mock, but
+// scripts loaded via window.eval below run after that inline script.)
+window.matchMedia = function(query) {
+  if (typeof query === 'string' && query.indexOf('prefers-reduced-motion') !== -1) {
+    return {
+      matches: true,
+      media: query,
+      onchange: null,
+      addListener: function() {},
+      removeListener: function() {},
+      addEventListener: function() {},
+      removeEventListener: function() {},
+      dispatchEvent: function() { return false; }
+    };
+  }
+  return {
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: function() {},
+    removeListener: function() {},
+    addEventListener: function() {},
+    removeEventListener: function() {},
+    dispatchEvent: function() { return false; }
+  };
+};
+
+// Disable fetch so persona.js / lore.js fall back to embedded JS data
+// (window.__PERSONA_FALLBACK and the FALLBACK constant). jsdom may or may
+// not ship fetch depending on version — making the policy explicit here.
+window.fetch = function () { return Promise.reject(new Error('fetch disabled in tests')); };
+
+// Load scripts in order — must match tests/index.html / index.html.
 const scripts = [
+  path.join(basePath, 'js', 'persona-data.js'),
+  path.join(basePath, 'js', 'persona.js'),
+  path.join(basePath, 'js', 'session-store.js'),
+  path.join(basePath, 'js', 'notify.js'),
+  path.join(basePath, 'js', 'shortcuts.js'),
+  path.join(basePath, 'js', 'window-manager.js'),
+  path.join(basePath, 'js', 'palette.js'),
+  path.join(basePath, 'js', 'shortcuts-cheatsheet.js'),
   path.join(basePath, 'js', 'terminal.js'),
   path.join(basePath, 'js', 'commands.js'),
   path.join(basePath, 'js', 'projects.js'),
-  path.join(basePath, 'js', 'easter-eggs.js'),
   path.join(basePath, 'js', 'game-overlay.js'),
+  path.join(basePath, 'js', 'easter-eggs.js'),
   path.join(basePath, 'js', 'themes.js'),
   path.join(basePath, 'js', 'matrix.js'),
   path.join(basePath, 'js', 'extras.js'),
+  path.join(basePath, 'js', 'icon.js'),
+  path.join(basePath, 'js', 'desktop.js'),
+  path.join(basePath, 'js', 'context-menu.js'),
+  path.join(basePath, 'js', 'taskbar.js'),
+  path.join(basePath, 'js', 'os-commands.js'),
+  path.join(basePath, 'js', 'apps', 'settings.js'),
+  path.join(basePath, 'js', 'apps', 'mail.js'),
+  path.join(basePath, 'js', 'apps', 'cv-viewer.js'),
+  path.join(basePath, 'js', 'apps', 'apps-grid.js'),
+  path.join(basePath, 'js', 'apps', 'boring-view.js'),
+  path.join(basePath, 'js', 'app-commands.js'),
+  path.join(basePath, 'js', 'lore.js'),
+  path.join(basePath, 'js', 'fs.js'),
+  path.join(basePath, 'js', 'terminal-tabs.js'),
+  path.join(basePath, 'js', 'pane-toggle.js'),
+  path.join(basePath, 'js', 'splitter.js'),
   path.join(basePath, 'js', 'boot.js'),
   path.join(basePath, 'js', 'konami.js'),
   path.join(basePath, 'js', 'idle.js'),
@@ -48,12 +113,27 @@ const scripts = [
   path.join(testPath, 'tests-v6.js'),
   path.join(testPath, 'tests-v7.js'),
   path.join(testPath, 'tests-v8.js'),
+  path.join(testPath, 'tests-os.js'),
 ];
 
 for (const scriptPath of scripts) {
   const code = readFile(scriptPath);
   window.eval(code);
 }
+
+// Several modules (pane-toggle.js, taskbar.js, splitter.js) defer init()
+// to DOMContentLoaded when document.readyState === 'loading' at script
+// eval time. Fire it manually so their listeners attach before tests run.
+// The inline listener in tests/index.html that auto-runs TestHarness is
+// guarded by window.__SKIP_AUTORUN_TESTS__ so it doesn't double-run.
+window.__SKIP_AUTORUN_TESTS__ = true;
+window.eval(
+  "if (document.readyState === 'loading') {" +
+  "  var ev = document.createEvent('Event');" +
+  "  ev.initEvent('DOMContentLoaded', true, true);" +
+  "  document.dispatchEvent(ev);" +
+  "}"
+);
 
 // Run tests
 const results = window.eval('TestHarness.run()');

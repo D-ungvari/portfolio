@@ -20,48 +20,151 @@
     h1 { color: #00d4ff; margin-bottom: 20px; font-size: 18px; }
     #test-output { white-space: pre-wrap; }
     #test-output div { min-height: 1.4em; }
+
+    /* Hide the OS-shell scaffolding so it doesn't interfere with the
+       human-facing test output when this page is opened in a real browser. */
+    #os-shell { display: none; }
   </style>
 </head>
-<body>
+<body data-active-pane="desktop">
   <h1>Portfolio Terminal — Test Suite</h1>
   <div id="test-output"></div>
 
-  <!-- The actual portfolio HTML structure (needed for DOM tests) -->
-  <div id="terminal" role="application" aria-label="Interactive terminal portfolio" style="display:none">
-    <div id="terminal-bar">
-      <span class="bar-dot red"></span>
-      <span class="bar-dot yellow"></span>
-      <span class="bar-dot green"></span>
-      <span class="bar-title">visitor@dave ~ /portfolio</span>
-    </div>
-    <div id="terminal-body" aria-live="polite" aria-relevant="additions">
-      <div id="output"></div>
-      <div id="input-line">
-        <span class="prompt">visitor@dave:~$&nbsp;</span>
-        <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
-        <input type="text" id="command-input"
-               autofocus autocomplete="off"
-               spellcheck="false" autocapitalize="off"
-               aria-label="Terminal command input">
+  <!-- Mirror of the production OS-shell DOM so tests can assert on it. -->
+  <div id="os-shell">
+    <header id="taskbar" role="banner">
+      <span id="taskbar-os-label">DavOS 1.0</span>
+      <span id="taskbar-workspace">─ workspace 1 ─</span>
+      <div id="taskbar-running" role="toolbar" aria-label="Running applications"></div>
+      <div id="taskbar-right">
+        <span id="taskbar-clock" aria-live="off">--:--</span>
       </div>
+    </header>
+    <main id="os-main" role="main">
+      <section id="desktop-pane" role="application" aria-label="Project desktop" tabindex="0">
+        <div id="desktop-wallpaper">
+          <div id="icon-grid" role="grid" aria-label="Project icons"></div>
+          <div id="trash-icon" role="button" aria-label="Trash" tabindex="0">🗑️</div>
+        </div>
+      </section>
+      <div id="pane-divider" role="separator" aria-orientation="vertical" tabindex="0"></div>
+      <section id="terminal-pane" class="terminal-pane">
+        <div id="terminal" role="application" aria-label="Interactive terminal portfolio">
+          <div id="terminal-bar">
+            <span class="bar-dot red"></span>
+            <span class="bar-dot yellow"></span>
+            <span class="bar-dot green"></span>
+            <span class="bar-title">visitor@dave ~ /portfolio</span>
+          </div>
+          <div id="terminal-body" aria-live="polite" aria-relevant="additions">
+            <div id="output"></div>
+            <div id="input-line">
+              <span class="prompt">visitor@dave:~$&nbsp;</span>
+              <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
+              <input type="text" id="command-input"
+                     autofocus autocomplete="off"
+                     spellcheck="false" autocapitalize="off"
+                     aria-label="Terminal command input">
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <nav id="mobile-commands" aria-label="Quick commands">
+      <button type="button" data-cmd="/help">/help</button>
+      <button type="button" data-cmd="/projects">/projects</button>
+      <button type="button" data-cmd="/about">/about</button>
+      <button type="button" data-cmd="/contact">/contact</button>
+    </nav>
+    <div id="pane-toggle" role="tablist" aria-label="Pane selector">
+      <button data-pane="desktop" role="tab" aria-selected="true">DESKTOP</button>
+      <button data-pane="terminal" role="tab" aria-selected="false">TERMINAL</button>
     </div>
   </div>
-  <nav id="mobile-commands" aria-label="Quick commands" style="display:none">
-    <button data-cmd="/help">/help</button>
-    <button data-cmd="/projects">/projects</button>
-    <button data-cmd="/about">/about</button>
-    <button data-cmd="/contact">/contact</button>
-  </nav>
 
-  <!-- Load app scripts -->
+  <!-- Mock prefers-reduced-motion BEFORE app scripts load so boot.js
+       takes the synchronous path during tests (no timers, no splash). -->
+  <script>
+    (function() {
+      var origMatchMedia = window.matchMedia;
+      window.matchMedia = function(query) {
+        if (typeof query === 'string' && query.indexOf('prefers-reduced-motion') !== -1) {
+          return {
+            matches: true,
+            media: query,
+            onchange: null,
+            addListener: function() {},
+            removeListener: function() {},
+            addEventListener: function() {},
+            removeEventListener: function() {},
+            dispatchEvent: function() { return false; }
+          };
+        }
+        if (origMatchMedia) return origMatchMedia.call(window, query);
+        return {
+          matches: false,
+          media: query,
+          onchange: null,
+          addListener: function() {},
+          removeListener: function() {},
+          addEventListener: function() {},
+          removeEventListener: function() {},
+          dispatchEvent: function() { return false; }
+        };
+      };
+    })();
+  </script>
+
+  <!-- Provide minimal CSS variables on :root so tests-os.js layout assertions pass.
+       In production these come from css/tokens.css; the harness inlines them here. -->
+  <style id="harness-tokens">
+    :root {
+      --color-bg: #0a0a0a;
+      --color-primary: #4af626;
+      --color-dim: #3a7a3a;
+      --color-glow: rgba(74, 246, 38, 0.3);
+      --color-border: #2a4a2a;
+      --color-scrollbar: #1a3a1a;
+      --color-chip-bg: #1a1a1a;
+      --terminal-width: 40%;
+      --taskbar-height: 32px;
+      --divider-width: 4px;
+    }
+  </style>
+
+  <!-- Load app scripts (production order — mirrors index.html exactly) -->
+  <script src="../js/persona-data.js"></script>
+  <script src="../js/persona.js"></script>
+  <script src="../js/session-store.js"></script>
+  <script src="../js/notify.js"></script>
+  <script src="../js/shortcuts.js"></script>
+  <script src="../js/window-manager.js"></script>
+  <script src="../js/palette.js"></script>
+  <script src="../js/shortcuts-cheatsheet.js"></script>
   <script src="../js/terminal.js"></script>
   <script src="../js/commands.js"></script>
   <script src="../js/projects.js"></script>
-  <script src="../js/easter-eggs.js"></script>
   <script src="../js/game-overlay.js"></script>
+  <script src="../js/easter-eggs.js"></script>
   <script src="../js/themes.js"></script>
   <script src="../js/matrix.js"></script>
   <script src="../js/extras.js"></script>
+  <script src="../js/icon.js"></script>
+  <script src="../js/desktop.js"></script>
+  <script src="../js/context-menu.js"></script>
+  <script src="../js/taskbar.js"></script>
+  <script src="../js/os-commands.js"></script>
+  <script src="../js/apps/settings.js"></script>
+  <script src="../js/apps/mail.js"></script>
+  <script src="../js/apps/cv-viewer.js"></script>
+  <script src="../js/apps/apps-grid.js"></script>
+  <script src="../js/apps/boring-view.js"></script>
+  <script src="../js/app-commands.js"></script>
+  <script src="../js/lore.js"></script>
+  <script src="../js/fs.js"></script>
+  <script src="../js/terminal-tabs.js"></script>
+  <script src="../js/pane-toggle.js"></script>
+  <script src="../js/splitter.js"></script>
   <script src="../js/boot.js"></script>
   <script src="../js/konami.js"></script>
   <script src="../js/idle.js"></script>
@@ -76,10 +179,17 @@
   <script src="tests-v6.js"></script>
   <script src="tests-v7.js"></script>
   <script src="tests-v8.js"></script>
+  <script src="tests-os.js"></script>
 
-  <!-- Run tests -->
+  <!-- Run tests.
+       The Node runner (run-tests.js) calls TestHarness.run() itself, so
+       we only auto-run from the browser path (where window.__JSDOM__ is
+       absent). The runner sets a sentinel before dispatching DCL so it
+       can dispatch DOMContentLoaded for module initializers without
+       triggering a duplicate test run. -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      if (window.__SKIP_AUTORUN_TESTS__) return;
       TestHarness.run();
     });
   </script>

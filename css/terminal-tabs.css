@@ -1,0 +1,71 @@
+/* Multi-tab terminal — Sprint B Phase 7 (B35b) */
+
+#term-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  padding: 4px 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  background: rgba(10, 10, 10, 0.8);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+#term-tabs::-webkit-scrollbar { display: none; }
+
+.term-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  color: var(--color-dim);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  height: 24px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.term-tab:hover { color: var(--color-primary); }
+.term-tab.active {
+  color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.08);
+  border-color: var(--color-primary);
+}
+.term-tab-label { pointer-events: none; }
+.term-tab-close {
+  font-size: 10px;
+  opacity: 0.5;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.term-tab-close:hover {
+  opacity: 1;
+  background: rgba(255, 95, 87, 0.2);
+  color: #ff5f57;
+}
+
+.term-tab-add {
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  color: var(--color-dim);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 0 8px;
+  height: 24px;
+  cursor: pointer;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.term-tab-add:hover { color: var(--color-primary); border-color: var(--color-primary); }
+
+@media (max-width: 639px) {
+  #term-tabs { padding: 2px 4px 0; }
+  .term-tab-label { max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+}

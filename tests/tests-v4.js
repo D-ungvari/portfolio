@@ -178,10 +178,12 @@ T.describe('Input Length Limit', function() {
 // ========================================
 
 T.describe('Complete Easter Egg Inventory', function() {
+  // /pwd, /ls, /cat were hidden easter eggs in v1/v2. v3 fs.js promotes
+  // them to first-class FS commands (visible in /help). Excluded here.
   var allEasterEggs = [
     '/sudo', '/rm', '/rm -rf /', '/exit', '/hire',
-    'hello', 'hi', '/whoami', '/date', '/pwd', '/ls',
-    '/cat', '/vim', '/emacs', '42',
+    'hello', 'hi', '/whoami', '/date',
+    '/vim', '/emacs', '42',
     '/neofetch', '/cowsay', '/fortune', '/ping', '/uptime', '/echo',
     '/matrix', '/banner', '/stats'
   ];

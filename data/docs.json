@@ -1,0 +1,139 @@
+{
+  "/swarm": {
+    "title": "swarm-command — design notes",
+    "problem": "Build a real-time strategy game in the browser. Sub-16ms frame budget across 100+ units with line-of-sight and AI.",
+    "architecture": [
+      "  ┌──────────────┐    ┌──────────────┐",
+      "  │  Input layer │───▶│  Game state  │",
+      "  └──────────────┘    │  (TypedArrays)│",
+      "                       └──────┬───────┘",
+      "                              │",
+      "      ┌─────────┬──────────┬──┴──┬─────────┐",
+      "      ▼         ▼          ▼     ▼         ▼",
+      "   Movement  Combat   Pathfind  Vision  Render",
+      "   system    system   system    system  (PixiJS)"
+    ],
+    "decisions": [
+      "TypedArrays > class instances — cache locality matters with 100+ units",
+      "Fixed 60 UPS, frame-rate input — deterministic, replayable",
+      "Hand-rolled ECS over a library — total control, ~400 LOC",
+      "Spatial hash for queries — 10x speedup over naive O(n²)"
+    ],
+    "tradeoffs": [
+      "ECS adds boilerplate vs OOP — paid for itself by unit 50",
+      "Fixed timestep adds input lag risk — mitigated by frame-rate input"
+    ],
+    "metrics": {
+      "loc": "~3500",
+      "tests": 180,
+      "fps": "60 stable, 100+ units",
+      "stack": "TypeScript, PixiJS v8, Vite, Vitest"
+    }
+  },
+  "/jobtracker": {
+    "title": "jobtracker — design notes",
+    "problem": "Track applications + extract structured data from job postings using LLMs without burning tokens or leaking PII.",
+    "architecture": [
+      "  Browser ──▶ Next.js API ──▶ Prisma ──▶ Postgres + pgvector",
+      "                  │                          ▲",
+      "                  ▼                          │",
+      "             Claude API ──▶ .NET extractor ──┘",
+      "             (cached)        (background queue)"
+    ],
+    "decisions": [
+      "Prompt caching on Claude — 80% cost reduction on repeated parses",
+      "pgvector + cosine similarity for semantic match",
+      ".NET 8 minimal API for the extraction queue — heavier work off Node",
+      "Dockerized end-to-end + GitHub Actions CI"
+    ],
+    "tradeoffs": [
+      "Adds .NET runtime to the stack — justified by extraction throughput",
+      "Cache invalidation on prompt changes is manual — acceptable at this scale"
+    ],
+    "metrics": {
+      "loc": "~6000",
+      "stack": "Next.js 16, Prisma, Postgres, pgvector, Claude API, .NET 8"
+    }
+  },
+  "/knowledgebase": {
+    "title": "knowledgebase — design notes",
+    "problem": "A personal wiki with both keyword and semantic search, where queries return the right note even if you don't remember the exact words.",
+    "architecture": [
+      "  Editor (Tiptap) ──▶ Next.js API ──▶ Postgres + pgvector",
+      "                                          ▲",
+      "                                          │",
+      "                       Embeddings ────────┘",
+      "                       (Claude API)"
+    ],
+    "decisions": [
+      "Hybrid search: tsvector full-text union'd with pgvector cosine — best of both",
+      "Embeddings on save, not on query — predictable cost",
+      "Tiptap for the editor — block-based, extensible, no Markdown ceremony"
+    ],
+    "tradeoffs": [
+      "No auth in v1 — single-user MVP",
+      "Embeddings re-run on full-edit, not diff — cheap enough at personal scale"
+    ],
+    "metrics": { "stack": "Next.js 16, Postgres, pgvector, Tiptap, Claude embeddings" }
+  },
+  "/horde": {
+    "title": "horde-shooter — design notes",
+    "problem": "Wave-based survival shooter in vanilla Canvas 2D, no engine, 60fps with hundreds of enemies.",
+    "architecture": [
+      "  Game loop ──▶ Spatial bins ──▶ Collision pass",
+      "       │                              │",
+      "       ▼                              ▼",
+      "    Entities                       Render (Canvas)"
+    ],
+    "decisions": [
+      "Spatial bins instead of quadtree — simpler, faster for uniform distributions",
+      "Object pools for bullets + particles — zero GC during waves",
+      "Procedural audio via WebAudio oscillators — no asset pipeline"
+    ],
+    "tradeoffs": ["Audio sounds 'retro' — fits the aesthetic, would need samples for AAA polish"],
+    "metrics": { "stack": "Vanilla JS, Canvas 2D, WebAudio" }
+  },
+  "/uxcrimes": {
+    "title": "uxcrimes — design notes",
+    "problem": "Teach dark UX patterns by trapping the player inside one. Each level is an escape room built from a real anti-pattern.",
+    "architecture": ["Per-level mini-game, declarative level config, shared chrome/score system."],
+    "decisions": [
+      "Each level is its own self-contained module — easy to add",
+      "No build step, drop in a folder + register in level list"
+    ],
+    "tradeoffs": ["Hard to share state across levels — accepted, levels are self-contained by design"],
+    "metrics": { "levels": 20, "stack": "Vanilla HTML/CSS/JS" }
+  },
+  "/platformer": {
+    "title": "platform-shooter — design notes",
+    "problem": "Arcade-style 2D shooter with mouse aim, screen wrap, and parallax.",
+    "architecture": ["Per-frame: input → physics → collisions → render. Server: Express + Postgres for leaderboard (optional)."],
+    "decisions": ["Screen-wrap simplifies world bounds + lets the parallax loop seamlessly", "Mouse aim with click-to-fire — lower skill floor than dual-stick"],
+    "tradeoffs": ["No mobile support — desktop-only by design"],
+    "metrics": { "stack": "Vanilla JS, Canvas 2D, Express, Postgres" }
+  },
+  "/portfolio": {
+    "title": "portfolio — design notes",
+    "problem": "A portfolio that's also the demo. OS metaphor + terminal, zero dependencies, deploys statically.",
+    "architecture": [
+      "  index.html ──▶ ~25 vanilla JS modules (no bundler)",
+      "                       │",
+      "                       ├──▶ Terminal engine + commands",
+      "                       ├──▶ Window manager (drag/resize/multi)",
+      "                       ├──▶ Desktop + icons + context menu",
+      "                       ├──▶ Native apps (Settings/Mail/CV/etc.)",
+      "                       └──▶ Persona JSON drives all copy"
+    ],
+    "decisions": [
+      "Vanilla everything — no build step, no deps, ships to GH Pages as static",
+      "Single persona.json source of truth — About, /availability, CV, /ask all read it",
+      "Real window manager not just full-screen overlay — multi-window proves it",
+      "440+ tests run in jsdom — same code works headless"
+    ],
+    "tradeoffs": [
+      "More LOC than a static page — paid back in 'this is the demo' factor",
+      "Some duplication across native apps — acceptable, each is small"
+    ],
+    "metrics": { "loc": "~7000", "tests": 440, "deps": 0 }
+  }
+}

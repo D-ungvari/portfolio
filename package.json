@@ -1,7 +1,7 @@
 {
   "name": "portfolio-terminal",
   "version": "1.0.0",
-  "description": "Terminal-themed developer portfolio — vanilla HTML/CSS/JS, 342 tests, zero runtime dependencies.",
+  "description": "DavOS portfolio — vanilla HTML/CSS/JS, 440 tests, zero runtime dependencies.",
   "main": "index.html",
   "directories": {
     "test": "tests"

@@ -1,8 +1,34 @@
 /**
- * v8 Feature tests — Game overlay, idle matrix, integration
+ * v8 Feature tests — Game overlay, idle matrix, integration.
+ *
+ * NOTE (DavOS v3): GameOverlay is now a thin shim that delegates to
+ * WindowManager. The legacy DOM ids (#game-overlay, #game-iframe, etc.)
+ * are gone — overlays are real WindowManager windows (.os-window inside
+ * #window-layer). These tests assert on the new DOM.
  */
 
 var T = TestHarness;
+
+// Helper: query the most recently opened window (post-shim)
+function _latestOsWindow() {
+  var wins = document.querySelectorAll('#window-layer .os-window');
+  return wins.length ? wins[wins.length - 1] : null;
+}
+
+// Helper: nuke any leftover .os-window elements between tests so prior
+// state doesn't pollute later assertions.
+function _cleanupAllWindows() {
+  if (typeof WindowManager !== 'undefined' && WindowManager.list) {
+    var list = WindowManager.list().slice();
+    for (var i = 0; i < list.length; i++) {
+      try { WindowManager.close(list[i].id); } catch (e) {}
+    }
+  }
+  var stragglers = document.querySelectorAll('#window-layer .os-window');
+  for (var j = 0; j < stragglers.length; j++) {
+    if (stragglers[j].parentNode) stragglers[j].parentNode.removeChild(stragglers[j]);
+  }
+}
 
 // ========================================
 // GAME OVERLAY TESTS
@@ -10,9 +36,7 @@ var T = TestHarness;
 
 T.describe('GameOverlay — API', function() {
   // Ensure clean state before these tests
-  if (typeof GameOverlay !== 'undefined' && GameOverlay.isOpen()) {
-    GameOverlay.close();
-  }
+  _cleanupAllWindows();
 
   T.it('GameOverlay is defined', function() {
     T.assertType(GameOverlay, 'object');
@@ -31,115 +55,171 @@ T.describe('GameOverlay — API', function() {
   });
 
   T.it('GameOverlay is closed after cleanup', function() {
-    GameOverlay.close();
+    _cleanupAllWindows();
     T.assertFalse(GameOverlay.isOpen());
   });
 });
 
 T.describe('GameOverlay — Open/Close', function() {
   T.it('open creates the overlay DOM', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
-    var overlay = document.getElementById('game-overlay');
+    var overlay = _latestOsWindow();
     T.assertNotNull(overlay, 'Overlay should be in DOM');
     T.assertTrue(GameOverlay.isOpen());
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('open sets active class', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
-    var overlay = document.getElementById('game-overlay');
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
     T.assertContains(overlay.className, 'active');
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('overlay has correct z-index', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
-    var overlay = document.getElementById('game-overlay');
-    // z-index is set via CSS, so check the id exists (CSS would apply in browser)
-    T.assertEqual(overlay.id, 'game-overlay');
-    GameOverlay.close();
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
+    // WindowManager assigns z-index dynamically; verify it's a positive number.
+    var z = parseInt(overlay.style.zIndex || '0', 10);
+    T.assert(z > 0, 'window should have a positive z-index (got ' + z + ')');
+    _cleanupAllWindows();
   });
 
   T.it('overlay has a close button', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
-    var closeBtn = document.getElementById('game-overlay-close');
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
+    var closeBtn = overlay.querySelector('.os-window-btn.close');
     T.assertNotNull(closeBtn);
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('overlay has an iframe', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
-    var iframe = document.getElementById('game-iframe');
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
+    var iframe = overlay.querySelector('.os-window-iframe');
     T.assertNotNull(iframe);
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('overlay shows loading text', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'MY GAME', mock);
-    var loading = document.getElementById('game-overlay-loading');
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
+    var loading = overlay.querySelector('.os-window-loading');
     T.assertNotNull(loading);
     T.assertContains(loading.textContent, 'loading');
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('overlay title shows project name', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'UXCRIMES', mock);
-    var title = document.querySelector('.game-overlay-title');
+    var overlay = _latestOsWindow();
+    T.assertNotNull(overlay);
+    var title = overlay.querySelector('.os-window-title');
     T.assertNotNull(title);
     T.assertContains(title.textContent, 'UXCRIMES');
-    GameOverlay.close();
+    _cleanupAllWindows();
   });
 
   T.it('close sets isOpen to false', function() {
+    _cleanupAllWindows();
     var mock = T.createMockTerminal();
     mock.inputEl = { blur: function() {}, focus: function() {} };
     GameOverlay.open('https://example.com', 'TEST', mock);
     GameOverlay.close();
-    // isOpen may take 200ms to become false due to fade, but synchronous close sets it immediately
     T.assertFalse(GameOverlay.isOpen());
   });
 });
 
 T.describe('GameOverlay — /play Integration', function() {
+  // The /play handler captured the original GameOverlay.open at registration
+  // time, so spying on the namespaced reference doesn't catch it. Instead we
+  // spy on WindowManager.open (the underlying call) — which the shim ALWAYS
+  // invokes. That gives us a deterministic assertion.
+  function spyWM() {
+    var calls = [];
+    var orig = WindowManager.open;
+    WindowManager.open = function(opts) {
+      calls.push(opts || {});
+      return orig.call(WindowManager, opts);
+    };
+    return {
+      calls: calls,
+      restore: function() { WindowManager.open = orig; }
+    };
+  }
+
   T.it('/play uxcrimes uses GameOverlay instead of window.open', function() {
-    var mock = T.createMockTerminal();
-    mock.inputEl = { blur: function() {}, focus: function() {} };
-    // The command should call GameOverlay.open, which creates overlay DOM
-    commandRegistry['/play uxcrimes'].handler(mock);
-    T.assertContains(mock.getAllText(), 'opening');
-    // Overlay should be open
-    T.assertTrue(GameOverlay.isOpen());
-    GameOverlay.close();
+    _cleanupAllWindows();
+    var spy = spyWM();
+    try {
+      var mock = T.createMockTerminal();
+      mock.inputEl = { blur: function() {}, focus: function() {} };
+      commandRegistry['/play uxcrimes'].handler(mock);
+      T.assertContains(mock.getAllText(), 'opening');
+      T.assert(spy.calls.length >= 1, 'WindowManager.open should be called via GameOverlay shim');
+      var first = spy.calls[0];
+      T.assertContains((first.url || '').toLowerCase(), 'uxcrimes');
+      T.assertContains(first.title || '', 'UXCRIMES');
+    } finally {
+      spy.restore();
+      _cleanupAllWindows();
+    }
   });
 
   T.it('/play horde uses GameOverlay', function() {
-    var mock = T.createMockTerminal();
-    mock.inputEl = { blur: function() {}, focus: function() {} };
-    commandRegistry['/play horde'].handler(mock);
-    T.assertTrue(GameOverlay.isOpen());
-    GameOverlay.close();
+    _cleanupAllWindows();
+    var spy = spyWM();
+    try {
+      var mock = T.createMockTerminal();
+      mock.inputEl = { blur: function() {}, focus: function() {} };
+      commandRegistry['/play horde'].handler(mock);
+      T.assert(spy.calls.length >= 1, 'WindowManager.open should be called');
+      T.assertContains(spy.calls[0].url || '', 'horde');
+    } finally {
+      spy.restore();
+      _cleanupAllWindows();
+    }
   });
 
   T.it('/play platformer uses GameOverlay', function() {
-    var mock = T.createMockTerminal();
-    mock.inputEl = { blur: function() {}, focus: function() {} };
-    commandRegistry['/play platformer'].handler(mock);
-    T.assertTrue(GameOverlay.isOpen());
-    GameOverlay.close();
+    _cleanupAllWindows();
+    var spy = spyWM();
+    try {
+      var mock = T.createMockTerminal();
+      mock.inputEl = { blur: function() {}, focus: function() {} };
+      commandRegistry['/play platformer'].handler(mock);
+      T.assert(spy.calls.length >= 1, 'WindowManager.open should be called');
+      T.assertContains(spy.calls[0].url || '', 'platform');
+    } finally {
+      spy.restore();
+      _cleanupAllWindows();
+    }
   });
 });
 
@@ -166,13 +246,20 @@ T.describe('Idle Timer', function() {
 
 T.describe('Final Regression After Overlay', function() {
   T.it('all visible commands still work', function() {
+    // v3: a handful of lore commands defer to a Promise chain that loads
+    // JSON via fetch (with embedded fallback). They emit asynchronously,
+    // so the sync mock check would flag them.
+    var asyncAllowed = {
+      '/clear': true,
+      '/man': true, '/motd': true, '/version': true, '/changelog': true,
+      '/docs': true, '/interview': true, '/demo': true
+    };
     for (var cmd in commandRegistry) {
       if (commandRegistry[cmd].hidden) continue;
+      if (asyncAllowed[cmd]) continue;
       var mock = T.createMockTerminal();
       commandRegistry[cmd].handler(mock);
-      if (cmd !== '/clear') {
-        T.assert(mock.getOutputCount() > 0 || mock.getHTMLCount() > 0, cmd + ' should produce output');
-      }
+      T.assert(mock.getOutputCount() > 0 || mock.getHTMLCount() > 0, cmd + ' should produce output');
     }
   });
 

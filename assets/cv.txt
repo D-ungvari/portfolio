@@ -1,0 +1,7 @@
+DAVID UNGVARI — Full-stack Developer
+Copenhagen, DK · qkaturo95@gmail.com
+github.com/D-ungvari · linkedin.com/in/davidungvari
+
+Stub placeholder. The CV viewer renders a formatted version from
+data/persona.json. If a real assets/cv.pdf is added later, the CV
+viewer can be extended to embed it via an <iframe>.

@@ -1,0 +1,18 @@
+{
+  "en": {
+    "boot_tagline": "full-stack developer. browser game builder.",
+    "about_role": "Full-stack Developer",
+    "about_languages": "Languages: English, Danish, Hungarian",
+    "availability_status": "open to interviews",
+    "availability_notice": "notice period: %d weeks",
+    "availability_remote": "remote: %s"
+  },
+  "da": {
+    "boot_tagline": "fuld-stack udvikler. browser-spil bygger.",
+    "about_role": "Fuld-stack Udvikler",
+    "about_languages": "Sprog: Engelsk, Dansk, Ungarsk",
+    "availability_status": "åben for samtaler",
+    "availability_notice": "opsigelsesvarsel: %d uger",
+    "availability_remote": "fjernarbejde: %s"
+  }
+}

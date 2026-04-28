@@ -1,12 +1,13 @@
+/* Existing mobile-commands chip nav (above bottom tab bar when terminal pane active) */
 #mobile-commands {
   display: none;
   position: fixed;
-  bottom: 0;
+  bottom: 56px; /* sits above the new bottom tab bar */
   left: 0;
   right: 0;
-  padding: 12px 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
-  background: #111111;
+  padding: 10px 12px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  background: rgba(17, 17, 17, 0.96);
   border-top: 1px solid var(--color-scrollbar);
   gap: 8px;
   flex-wrap: wrap;
@@ -25,46 +26,142 @@
   transition: background 0.15s, border-color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
-
 #mobile-commands button:active {
   background: var(--color-border);
   border-color: var(--color-primary);
 }
 
-@media (max-width: 768px) {
-  #terminal {
+/* Bottom pane-toggle bar (mobile only) */
+#pane-toggle {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: rgba(10, 10, 10, 0.96);
+  border-top: 1px solid var(--color-border);
+  z-index: 200;
+  font-family: 'JetBrains Mono', monospace;
+}
+#pane-toggle button {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--color-dim);
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.12s, background 0.12s;
+}
+#pane-toggle button.active {
+  color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.06);
+  text-shadow: 0 0 4px var(--color-glow);
+}
+#pane-toggle button:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+/* Tablet (640–1023): stacked panes, divider becomes a row */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #os-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr var(--divider-width) var(--terminal-height, 45%);
+  }
+  #pane-divider {
+    cursor: row-resize;
+  }
+  #pane-divider[aria-orientation="vertical"] {
+    /* keep ARIA but visually act as horizontal */
+  }
+  .terminal-pane #terminal {
     padding: 0 16px;
   }
+}
 
+/* Mobile (< 640): tab toggle, only one pane visible */
+@media (max-width: 639px) {
   body {
     font-size: 13px;
   }
-
-  #mobile-commands {
+  #os-main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+  #pane-divider {
+    display: none;
+  }
+  #desktop-pane,
+  #terminal-pane {
+    grid-column: 1;
+    grid-row: 1;
+    display: none;
+  }
+  body[data-active-pane="desktop"] #desktop-pane,
+  body[data-active-pane="terminal"] #terminal-pane {
+    display: flex;
+    flex-direction: column;
+  }
+  #desktop-pane {
+    flex-direction: column;
+  }
+  body[data-active-pane="desktop"] #desktop-pane {
+    display: block;
+  }
+  #pane-toggle {
     display: flex;
   }
-
-  #terminal-body {
-    padding-bottom: 80px;
+  /* Mobile-commands only visible while terminal pane active */
+  body[data-active-pane="terminal"] #mobile-commands {
+    display: flex;
   }
-
+  /* Add bottom padding to terminal-body so input isn't hidden behind tab bar */
+  body[data-active-pane="terminal"] #terminal-body {
+    padding-bottom: 120px; /* room for chip nav + tab bar */
+  }
+  body[data-active-pane="desktop"] #desktop-wallpaper {
+    padding-bottom: 80px; /* room for tab bar */
+  }
+  /* Smaller icons on mobile */
+  #icon-grid {
+    grid-template-columns: repeat(auto-fill, 80px);
+    gap: 12px;
+  }
+  .desktop-icon { width: 80px; }
+  .desktop-icon .icon-glyph {
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+  }
+  .desktop-icon .icon-label { font-size: 10px; }
+  /* Smaller taskbar */
+  #taskbar {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  #taskbar-workspace { display: none; }
+  #taskbar-theme-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+  /* Smaller welcome ASCII */
   .output-line.ascii {
     font-size: 8px;
     line-height: 1.1;
   }
 }
 
-@media (max-width: 480px) {
-  #terminal {
-    padding: 0 12px;
-  }
+@media (max-width: 380px) {
+  .output-line.ascii { font-size: 6px; }
+  #icon-grid { grid-template-columns: repeat(auto-fill, 72px); }
+  .desktop-icon { width: 72px; }
+}
 
-  .output-line.ascii {
-    font-size: 6px;
-  }
-
-  #mobile-commands button {
-    padding: 6px 12px;
-    font-size: 13px;
-  }
+@media (prefers-reduced-motion: reduce) {
+  #pane-toggle button { transition: none; }
 }

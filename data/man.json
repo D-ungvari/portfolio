@@ -1,0 +1,68 @@
+{
+  "dave": {
+    "name": "dave — full-stack developer, copenhagen",
+    "synopsis": "dave [--available] [--remote=hybrid] [--language=en|da|hu]",
+    "description": "Dave Ungvari is a full-stack developer at Omada A/S in Copenhagen. By day: React, TypeScript, GraphQL, C#/.NET, SQL Server. By night: vanilla JS Canvas games, TypeScript RTS, AI-powered side projects (Claude API, pgvector RAG).",
+    "options": [
+      "--available       check current availability status (see /availability)",
+      "--remote=MODE     accepted modes: hybrid (preferred), onsite (Copenhagen), remote (case-by-case)",
+      "--language=LANG   en (fluent), da (working), hu (native)"
+    ],
+    "see_also": "portfolio(1), swarm(1), /ask, /interview, /contact"
+  },
+  "portfolio": {
+    "name": "portfolio — terminal-themed developer portfolio",
+    "synopsis": "portfolio [--theme=NAME] [--mode=desktop|terminal|boring]",
+    "description": "An OS-style developer portfolio. Click icons or type commands. 7 projects, 4 themes, 50+ commands, easter eggs, recruiter mode. Zero dependencies, vanilla HTML/CSS/JS, ~7000 LOC.",
+    "options": [
+      "--theme=NAME      green (default), amber, blue, matrix",
+      "--mode=MODE       desktop (default), terminal-only, boring (static CV)"
+    ],
+    "see_also": "dave(1), /help, /grid, /boring"
+  },
+  "swarm": {
+    "name": "swarm — starcraft-inspired browser RTS",
+    "synopsis": "swarm [--difficulty=1-4] [--units=13]",
+    "description": "Real-time strategy game. TypeScript + PixiJS v8. Hand-rolled ECS with TypedArrays for cache-efficient simulation. 13 units, fog of war, spatial hash queries, adaptive AI with 4 difficulty levels and multi-prong attacks. 180 tests. 60 UPS fixed timestep, frame-rate input.",
+    "options": [
+      "--difficulty=1    rookie",
+      "--difficulty=4    insane (will crush you)"
+    ],
+    "see_also": "dave(1), /docs swarm"
+  },
+  "horde": {
+    "name": "horde — roguelike survival shooter",
+    "synopsis": "horde",
+    "description": "Wave-based survival shooter. Vanilla Canvas 2D, no engine. 3 biomes, procedural audio, weapon evolutions, gold-based meta-progression.",
+    "options": ["(controls in-game)"],
+    "see_also": "/docs horde"
+  },
+  "uxcrimes": {
+    "name": "uxcrimes — dark UX patterns puzzle game",
+    "synopsis": "uxcrimes",
+    "description": "20 levels of escape rooms built around manipulative UI: cookie banners, deceptive checkboxes, hostile unsubscribes. Vanilla JS.",
+    "options": ["(no flags — just escape)"],
+    "see_also": "/docs uxcrimes"
+  },
+  "jobtracker": {
+    "name": "jobtracker — AI-powered job application tracker",
+    "synopsis": "jobtracker",
+    "description": "Full-stack Kanban board for job hunts. Claude API for resume parsing, pgvector for semantic search, .NET 8 extraction pipeline, dockerized, CI/CD.",
+    "options": ["(see live demo)"],
+    "see_also": "/docs jobtracker"
+  },
+  "knowledgebase": {
+    "name": "knowledgebase — personal wiki with hybrid RAG",
+    "synopsis": "knowledgebase",
+    "description": "Notes app with full-text + semantic search via pgvector embeddings. RAG pipeline for natural-language queries over your own notes.",
+    "options": ["(see live demo)"],
+    "see_also": "/docs knowledgebase"
+  },
+  "platformer": {
+    "name": "platformer — arcade platform shooter",
+    "synopsis": "platformer",
+    "description": "2D arcade shooter on floating platforms. Mouse-aim shooting, 3 enemy types, weapon pickups, parallax backgrounds, screen-wrap.",
+    "options": ["(controls in-game)"],
+    "see_also": "/docs platformer"
+  }
+}

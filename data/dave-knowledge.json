@@ -1,0 +1,25 @@
+{
+  "qa": [
+    { "keywords": ["available", "availability", "open", "hire", "hiring"],
+      "answer": "Yes — open to senior full-stack roles in Copenhagen (hybrid). 3-week notice. Type /availability for full details." },
+    { "keywords": ["remote", "onsite", "hybrid"],
+      "answer": "Hybrid preferred (2-3 days office in Greater Copenhagen). Full remote case-by-case." },
+    { "keywords": ["salary", "comp", "compensation", "pay", "dkk"],
+      "answer": "Comp range 750-950k DKK base, depends on role + level + remote split. Type /availability for the source." },
+    { "keywords": ["dotnet", ".net", "c#", "csharp"],
+      "answer": "C#/.NET in production daily for 3+ years at Omada A/S. Built REST + GraphQL services, SQL Server data layer, .NET 8 extraction pipeline for the JobTracker side project." },
+    { "keywords": ["react", "typescript", "frontend"],
+      "answer": "React + TypeScript is the daily driver. Built the entire frontend at Omada (identity governance UI, complex tables, GraphQL hooks). Side projects use Next.js + Tailwind." },
+    { "keywords": ["ai", "claude", "rag", "pgvector", "llm"],
+      "answer": "Built two RAG systems: JobTracker (Claude API for resume parsing) + KnowledgeBase (hybrid full-text + semantic search via pgvector). Comfortable with prompt caching, tool use, embeddings, retrieval pipelines." },
+    { "keywords": ["games", "canvas", "rts", "pixi"],
+      "answer": "Three browser games (vanilla Canvas 2D) and one TypeScript RTS (Swarm Command, PixiJS v8). The RTS has a hand-rolled ECS with TypedArrays, fog of war, spatial hash queries, adaptive AI. 180 tests." },
+    { "keywords": ["language", "danish", "hungarian", "english"],
+      "answer": "Hungarian native. English fluent (work language). Danish working level — improving daily, comfortable in casual + standup contexts." },
+    { "keywords": ["education", "university", "degree", "master", "msc"],
+      "answer": "M.Sc. Information Science (Aalborg University, software engineering focus). B.Tech Product Development (KEA Copenhagen, IT & electronics)." },
+    { "keywords": ["contact", "email", "reach", "linkedin"],
+      "answer": "Type /contact for github, linkedin, email. /mail opens the inbox if you prefer that vibe." }
+  ],
+  "fallback": "Not sure I have a canned answer for that. Try /about, /availability, or /contact for direct ways to reach Dave."
+}

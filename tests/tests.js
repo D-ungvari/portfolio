@@ -227,8 +227,8 @@ T.describe('Projects — Data Integrity', function() {
     T.assert(Array.isArray(projects), 'projects should be an array');
   });
 
-  T.it('has exactly 6 projects', function() {
-    T.assertArrayLength(projects, 6);
+  T.it('has exactly 7 projects', function() {
+    T.assertArrayLength(projects, 7);
   });
 
   T.it('each project has required fields', function() {
@@ -374,6 +374,9 @@ T.describe('/projects List Command', function() {
 // ========================================
 
 T.describe('Easter Eggs', function() {
+  // /pwd, /ls, /cat were hidden easter eggs in v1/v2. In v3 fs.js promotes
+  // them to first-class FS commands (visible in /help). They're tested
+  // separately in the Sprint B FS suite.
   var easterEggs = [
     { cmd: '/sudo', contains: 'permission denied' },
     { cmd: '/rm', contains: 'nice try' },
@@ -383,9 +386,6 @@ T.describe('Easter Eggs', function() {
     { cmd: 'hello', contains: '/help' },
     { cmd: 'hi', contains: '/help' },
     { cmd: '/whoami', contains: 'visitor' },
-    { cmd: '/pwd', contains: '/home' },
-    { cmd: '/ls', contains: 'projects/' },
-    { cmd: '/cat', contains: 'usage' },
     { cmd: '/vim', contains: 'exiting' },
     { cmd: '/emacs', contains: 'operating system' },
     { cmd: '42', contains: 'life' }

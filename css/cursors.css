@@ -1,0 +1,35 @@
+/* Contextual cursors — DavOS v4 C6.1 */
+
+.os-window-titlebar { cursor: move; }
+.os-window-titlebar .os-window-btn { cursor: pointer; }
+
+#terminal-pane,
+#terminal-body,
+#output { cursor: text; }
+
+#input-line,
+#command-input { cursor: text; }
+
+.desktop-icon,
+.taskbar-app,
+.context-menu-item,
+.taskbar-menu-item,
+#trash-icon,
+#taskbar-os-label,
+#taskbar-clock,
+.tray-item { cursor: pointer; }
+
+.desktop-icon.dragging,
+.os-window.dragging .os-window-titlebar { cursor: grabbing; }
+
+button[disabled],
+.disabled,
+.context-menu-item.disabled { cursor: not-allowed; }
+
+.os-window-loading,
+.loading { cursor: wait; }
+
+#desktop-wallpaper { cursor: default; }
+
+/* Selection lasso area: crosshair */
+#desktop-pane.lasso-active { cursor: crosshair; }

@@ -1,0 +1,278 @@
+/* Wallpaper: layered backgrounds + per-theme overlay + parallax */
+#desktop-wallpaper {
+  --parallax-x: 0px;
+  --parallax-y: 0px;
+  position: relative;
+  background-color: var(--color-bg);
+  padding: 32px;
+  box-sizing: border-box;
+  min-height: 100%;
+}
+/* Base dot grid */
+#desktop-wallpaper::before {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  background-image: radial-gradient(circle, var(--color-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: 0 0;
+  pointer-events: none;
+  z-index: 0;
+  transform: translate3d(calc(var(--parallax-x) * 0.4), calc(var(--parallax-y) * 0.4), 0);
+  transition: transform 200ms linear;
+}
+/* Theme overlay layer + radial vignette */
+#desktop-wallpaper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.35) 100%),
+    var(--wallpaper-overlay, transparent);
+  mix-blend-mode: screen;
+  transform: translate3d(calc(var(--parallax-x) * 0.7), calc(var(--parallax-y) * 0.7), 0);
+  transition: transform 240ms linear;
+}
+#desktop-wallpaper.parallax-on::before,
+#desktop-wallpaper.parallax-on::after {
+  transition: transform 100ms linear;
+}
+#desktop-wallpaper > * { position: relative; z-index: 2; }
+
+/* Icon grid */
+#icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 96px);
+  gap: 16px;
+  align-content: start;
+}
+
+/* Single icon */
+.desktop-icon {
+  width: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.desktop-icon:hover { border-color: var(--color-border); }
+.desktop-icon.selected {
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.06);
+  box-shadow: 0 0 8px var(--color-glow);
+}
+.desktop-icon:focus-visible { border-color: var(--color-accent); }
+.desktop-icon.dragging { opacity: 0.5; }
+
+.desktop-icon .icon-glyph {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: linear-gradient(180deg, var(--color-primary-bg-soft), var(--color-primary-bg-softer));
+  border-radius: 6px;
+  text-shadow: 0 0 6px var(--color-glow);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.desktop-icon:hover .icon-glyph {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 6px 16px var(--color-glow);
+}
+.desktop-icon:active .icon-glyph,
+.desktop-icon.dragging .icon-glyph {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px var(--color-primary),
+    inset 0 1px 0 rgba(0, 0, 0, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+/* Multi-char glyphs need smaller fonts to fit in the 64×64 box */
+.desktop-icon[data-glyph-len="2"] .icon-glyph,
+.desktop-icon[data-glyph-len="3"] .icon-glyph {
+  font-size: 22px;
+  letter-spacing: -1px;
+}
+.desktop-icon[data-glyph-len="3"] .icon-glyph {
+  font-size: 18px;
+}
+
+.desktop-icon .icon-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--color-primary);
+  text-align: center;
+  word-break: break-word;
+  line-height: 1.2;
+  text-shadow: 0 0 3px var(--color-glow);
+}
+
+/* Tooltip (only on devices that hover) */
+@media (hover: hover) {
+  .desktop-tooltip {
+    position: fixed;
+    z-index: 5000;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--color-border);
+    color: var(--color-dim);
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 4px;
+    pointer-events: none;
+    max-width: 240px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  }
+}
+
+/* Trash — ASCII bin */
+#trash-icon {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s, opacity 0.12s;
+  z-index: 10;
+  opacity: 0.55;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-primary);
+}
+#trash-icon .trash-art {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1;
+  white-space: pre;
+  color: inherit;
+}
+#trash-icon:hover { opacity: 1; }
+#trash-icon.drop-target {
+  opacity: 1;
+  transform: scale(1.1);
+}
+#trash-icon.drop-target .trash-art::before {
+  content: '';
+}
+#trash-icon.wiggle { animation: trash-wiggle 0.4s ease-in-out; }
+@keyframes trash-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-12deg); }
+  75% { transform: rotate(12deg); }
+}
+
+/* Toast for trash easter egg */
+.desktop-toast {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  background: rgba(10, 10, 10, 0.95);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  padding: 10px 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  border-radius: 4px;
+  z-index: 6000;
+  box-shadow: 0 0 12px var(--color-glow);
+  animation: toast-in 0.2s ease-out;
+}
+@keyframes toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.desktop-toast.fading { opacity: 0; transition: opacity 0.3s; }
+
+/* Context menu */
+.context-menu {
+  position: fixed;
+  z-index: 7000;
+  min-width: 200px;
+  background: rgba(10, 10, 10, 0.97);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.7);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 4px 0;
+  user-select: none;
+}
+.context-menu-item {
+  padding: 6px 14px;
+  color: var(--color-primary);
+  cursor: pointer;
+}
+.context-menu-item:hover {
+  background: rgba(74, 246, 38, 0.12);
+}
+.context-menu-item.disabled {
+  color: var(--color-dim);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-icon, #trash-icon, .desktop-toast { transition: none; animation: none; }
+  .desktop-icon .icon-glyph { transition: none; }
+  .desktop-icon:hover .icon-glyph,
+  .desktop-icon:active .icon-glyph,
+  .desktop-icon.dragging .icon-glyph { transform: none; }
+  #trash-icon.wiggle { animation: none; }
+}
+
+/* Selection lasso (marquee) */
+.desktop-lasso {
+  position: absolute;
+  z-index: 50;
+  background: rgba(74, 246, 38, 0.08);
+  border: 1px dashed var(--color-primary);
+  pointer-events: none;
+}
+.desktop-icon.lasso-selected {
+  border-color: var(--color-primary);
+  background: rgba(74, 246, 38, 0.06);
+}
+
+/* Wallpaper refresh flash (right-click wallpaper → Refresh wallpaper) */
+#desktop-wallpaper.refreshing {
+  animation: wallpaper-refresh 0.32s ease-out;
+}
+@keyframes wallpaper-refresh {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
+}
+
+/* Drop target highlight on the terminal pane (drag icon → terminal) */
+#terminal-pane.drop-target {
+  outline: 2px dashed var(--color-primary);
+  outline-offset: -4px;
+  background: rgba(74, 246, 38, 0.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #desktop-wallpaper.refreshing { animation: none; }
+}
