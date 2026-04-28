@@ -1,17 +1,22 @@
 {
-  "name": "portfolio",
+  "name": "portfolio-terminal",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Terminal-themed developer portfolio — vanilla HTML/CSS/JS, 342 tests, zero runtime dependencies.",
+  "main": "index.html",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node tests/run-tests.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "portfolio",
+    "terminal",
+    "vanilla-js",
+    "developer-portfolio"
+  ],
+  "author": "David Ungvari",
+  "license": "MIT",
   "devDependencies": {
     "jsdom": "^28.1.0"
   }
