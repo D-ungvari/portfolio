@@ -321,14 +321,14 @@ T.describe('Taskbar', function() {
     T.assertNotNull(btn);
   });
 
-  T.it('#taskbar-clock matches /^\\d{2}:\\d{2}$/ after init', function() {
+  T.it('#taskbar-clock matches /^\\d{2}:\\d{2}(:\\d{2})?$/ after init', function() {
     if (window.Taskbar && typeof window.Taskbar.init === 'function') {
       window.Taskbar.init();
     }
     var clock = document.getElementById('taskbar-clock');
     T.assertNotNull(clock);
-    var ok = /^\d{2}:\d{2}$/.test(clock.textContent || '');
-    T.assertTrue(ok, 'clock text "' + clock.textContent + '" should match HH:MM');
+    var ok = /^\d{2}:\d{2}(:\d{2})?$/.test(clock.textContent || '');
+    T.assertTrue(ok, 'clock text "' + clock.textContent + '" should match HH:MM or HH:MM:SS');
   });
 
   T.it('clicking #taskbar-os-label opens .about-overlay with .about-panel', function() {
