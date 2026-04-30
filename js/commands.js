@@ -2,6 +2,7 @@
  * Command registry and built-in commands.
  */
 var commandRegistry = {};
+var commandPrefixRegistry = []; // [{ prefix, handler }] — checked after exact-match
 
 function registerCommand(name, description, handler, hidden) {
   commandRegistry[name.toLowerCase()] = {
@@ -9,6 +10,15 @@ function registerCommand(name, description, handler, hidden) {
     handler: handler,
     hidden: hidden || false
   };
+}
+
+/**
+ * Register a multi-arg command. Handler receives (terminal, rest, raw) where
+ * rest is the substring after `prefix` and raw is the original input. Useful
+ * for `/sudo <anything>` and similar patterns where the joke needs the args.
+ */
+function registerCommandPrefix(prefix, handler) {
+  commandPrefixRegistry.push({ prefix: prefix.toLowerCase(), handler: handler });
 }
 
 function registerAlias(alias, target) {
@@ -28,10 +38,19 @@ function executeCommand(rawInput, terminal) {
 
   if (commandRegistry[input]) {
     commandRegistry[input].handler(terminal);
-  } else {
-    terminal.output('command not found: ' + rawInput.trim(), 'error');
-    terminal.output('type /help for available commands.', 'dim');
+    return;
   }
+  // Prefix-match fallthrough — first match wins, longest prefix first
+  var matches = commandPrefixRegistry.filter(function (p) { return input.indexOf(p.prefix) === 0; });
+  if (matches.length) {
+    matches.sort(function (a, b) { return b.prefix.length - a.prefix.length; });
+    var m = matches[0];
+    var rest = input.slice(m.prefix.length).trim();
+    m.handler(terminal, rest, rawInput.trim());
+    return;
+  }
+  terminal.output('command not found: ' + rawInput.trim(), 'error');
+  terminal.output('type /help for available commands.', 'dim');
 }
 
 // --- Built-in commands ---

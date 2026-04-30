@@ -242,9 +242,11 @@
       var iframe = document.createElement('iframe');
       iframe.className = 'os-window-iframe';
       iframe.setAttribute('allow', 'fullscreen; autoplay');
+      root.classList.add('loading');
       iframe.addEventListener('load', function () {
         iframe.classList.add('loaded');
         loading.classList.add('hidden');
+        root.classList.remove('loading');
       });
       iframe.src = state.url;
       body.appendChild(iframe);
@@ -402,6 +404,7 @@
       origX = state.x;
       origY = state.y;
       root.classList.add('dragging');
+      document.body.classList.add('dragging');
       try { bar.setPointerCapture && bar.setPointerCapture(pointerId); } catch (err) {}
       e.preventDefault();
     }
@@ -432,6 +435,7 @@
       if (!dragging) return;
       dragging = false;
       root.classList.remove('dragging');
+      document.body.classList.remove('dragging');
       hideSnapPreview();
       try { bar.releasePointerCapture && pointerId != null && bar.releasePointerCapture(pointerId); } catch (err) {}
       pointerId = null;
@@ -475,6 +479,7 @@
       origW = state.w;
       origH = state.h;
       root.classList.add('resizing');
+      document.body.classList.add('resizing-' + dir);
       try { handle.setPointerCapture && handle.setPointerCapture(pointerId); } catch (err) {}
       e.preventDefault();
       e.stopPropagation();
@@ -514,8 +519,9 @@
     function onUp(e) {
       if (!resizing) return;
       resizing = false;
-      dir = null;
       root.classList.remove('resizing');
+      if (dir) document.body.classList.remove('resizing-' + dir);
+      dir = null;
       pointerId = null;
       emit('window:geometry', { id: state.id });
       persist();
@@ -683,7 +689,7 @@
       persist();
     };
 
-    if (el && window.Anim && typeof window.Anim.scaleOut === 'function') {
+    if (el && window.Anim && typeof window.Anim.scaleOut === 'function' && !window.Anim.reduced()) {
       window.Anim.scaleOut(el, { to: 0.92, dur: 140 }).then(doRemove);
     } else {
       doRemove();
@@ -713,7 +719,7 @@
     };
 
     var btn = taskbarBtns[id];
-    if (btn && window.Anim && typeof window.Anim.genie === 'function') {
+    if (btn && window.Anim && typeof window.Anim.genie === 'function' && !window.Anim.reduced()) {
       var br = btn.getBoundingClientRect();
       var target = { x: br.left, y: br.top, w: br.width, h: br.height };
       window.Anim.genie(el, target, { dur: 280 }).then(finish);
@@ -862,8 +868,63 @@
       if (ok) close(state.id);
     });
 
+    // E08 — hover thumbnail tooltip
+    var hoverTimer = null;
+    btn.addEventListener('mouseenter', function (e) {
+      if (e.pointerType === 'touch') return;
+      var delay = (window.Anim && Anim.reduced && Anim.reduced()) ? 0 : 200;
+      hoverTimer = setTimeout(function () {
+        showThumb(btn, state);
+      }, delay);
+    });
+    btn.addEventListener('mouseleave', function () {
+      if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+      hideThumb();
+    });
+    btn.addEventListener('mousedown', function () {
+      if (hoverTimer) { clearTimeout(hoverTimer); hoverTimer = null; }
+      hideThumb();
+    });
+
     taskbarRunningEl.appendChild(btn);
     taskbarBtns[state.id] = btn;
+  }
+
+  // Singleton thumbnail tooltip
+  var thumbEl = null;
+  function showThumb(btn, state) {
+    hideThumb();
+    var s = windows[state.id];
+    if (!s) return;
+    thumbEl = document.createElement('div');
+    thumbEl.className = 'taskbar-thumb';
+    thumbEl.style.zIndex = (window.Layer && Layer.POPOUTS) ? (Layer.POPOUTS - 1) : 3999;
+    var glyph = (state.app === 'files' ? '▤' :
+                 state.app === 'mail' ? '✉' :
+                 state.app === 'settings' ? '⚙' :
+                 state.app === 'cv' ? '📄' :
+                 state.app === 'apps' ? '▦' :
+                 state.app === 'text-viewer' ? '◫' : '▣');
+    thumbEl.innerHTML =
+      '<div class="taskbar-thumb-card">' +
+        '<div class="taskbar-thumb-glyph">' + glyph + '</div>' +
+      '</div>' +
+      '<div class="taskbar-thumb-title"></div>';
+    thumbEl.querySelector('.taskbar-thumb-title').textContent = state.title || state.app || '';
+    document.body.appendChild(thumbEl);
+    var br = btn.getBoundingClientRect();
+    var tw = thumbEl.offsetWidth;
+    var left = br.left + (br.width / 2) - (tw / 2);
+    if (left < 4) left = 4;
+    if (left + tw > window.innerWidth - 4) left = window.innerWidth - tw - 4;
+    var top = br.top - thumbEl.offsetHeight - 8;
+    if (top < 4) top = br.bottom + 8;
+    thumbEl.style.left = left + 'px';
+    thumbEl.style.top = top + 'px';
+  }
+  function hideThumb() {
+    if (thumbEl && thumbEl.parentNode) thumbEl.parentNode.removeChild(thumbEl);
+    thumbEl = null;
   }
 
   function removeTaskbarButton(id) {

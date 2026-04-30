@@ -253,7 +253,13 @@
 }
 .desktop-icon.lasso-selected {
   border-color: var(--color-primary);
-  background: rgba(74, 246, 38, 0.06);
+  background: rgba(74, 246, 38, 0.10);
+  box-shadow: 0 0 0 1px var(--color-primary), 0 0 12px rgba(74, 246, 38, 0.18);
+}
+.desktop-icon.lasso-selected.group-dragging {
+  opacity: 0.55;
+  transform: scale(1.02);
+  transition: transform 0.12s ease-out, opacity 0.12s ease-out;
 }
 
 /* Wallpaper refresh flash (right-click wallpaper → Refresh wallpaper) */

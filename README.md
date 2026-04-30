@@ -72,9 +72,10 @@ of them. Highlights:
 | **OS**       | `/htop`, `/desktop`, `/shutdown`, `/logout`, `/clear`, `/history`, `/stats` |
 | **Easter eggs** | `/sudo`, `/rm`, `/vim`, `/emacs`, `/cowsay`, `/fortune`, `/matrix`, `42`, Konami, … |
 
-Full architectural and command spec: [`PLAN-OS-V3.md`](PLAN-OS-V3.md).
-The pre-v3 OS shell is preserved in [`PLAN-OS.md`](PLAN-OS.md) and the
-single-pane v1 layout in [`PLAN.md`](PLAN.md).
+Full architectural and command spec: [`PLAN-OS-V3.md`](.sdlc/archive/PLAN-OS-V3.md)
+and [`PLAN-OS-V4.md`](.sdlc/archive/PLAN-OS-V4.md). The pre-v3 OS shell is
+preserved in [`PLAN-OS.md`](.sdlc/archive/PLAN-OS.md) and the single-pane v1
+layout in [`PLAN.md`](PLAN.md).
 
 ## Adding a Project
 
@@ -141,7 +142,7 @@ automatically. No build step.
 
 ## Architecture
 
-See [`PLAN-OS-V3.md`](PLAN-OS-V3.md) for the full v3 spec. In short: ~25 ES5
+See [`PLAN-OS-V3.md`](.sdlc/archive/PLAN-OS-V3.md) and [`PLAN-OS-V4.md`](.sdlc/archive/PLAN-OS-V4.md) for the full v3/v4 specs. In short: ~45 ES5
 modules, no bundler, IIFE-scoped, idempotent inits. The window manager is the
 spine; everything visible is either a window or chrome. Persona JSON is the
 spine of all copy. Session storage round-trips theme, settings, terminal
@@ -150,5 +151,6 @@ tabs, cwd, window geometry, and visit count.
 ## History
 
 - v1 — single-pane terminal-only ([`PLAN.md`](PLAN.md))
-- v2 — OS desktop + terminal pane ([`PLAN-OS.md`](PLAN-OS.md))
-- v3 — window manager + native apps + persona + lore ([`PLAN-OS-V3.md`](PLAN-OS-V3.md))
+- v2 — OS desktop + terminal pane ([`PLAN-OS.md`](.sdlc/archive/PLAN-OS.md))
+- v3 — window manager + native apps + persona + lore ([`PLAN-OS-V3.md`](.sdlc/archive/PLAN-OS-V3.md))
+- v4 — visual fidelity, launcher, lock/login screens, widgets ([`PLAN-OS-V4.md`](.sdlc/archive/PLAN-OS-V4.md))

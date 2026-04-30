@@ -99,7 +99,87 @@
     return el;
   }
 
-  var BUILDERS = { clock: buildClock, sysinfo: buildSysinfo, quote: buildQuote };
+  // ---- Pong widget (sprint E E15) — hidden 4th, unlocked by Konami / /pong ----
+  function buildPong() {
+    var el = document.createElement('div');
+    el.className = 'desktop-widget widget-pong';
+    var pre = document.createElement('pre');
+    pre.className = 'widget-pong-screen';
+    el.appendChild(pre);
+
+    var W = 28, H = 12;
+    var ball = { x: W / 2, y: H / 2, vx: 0.6, vy: 0.4 };
+    var leftY = H / 2, rightY = H / 2;
+    var paddleH = 3;
+    var userControl = false;
+
+    el.addEventListener('mouseenter', function () { userControl = true; });
+    el.addEventListener('mouseleave', function () { userControl = false; });
+    el.addEventListener('mousemove', function (e) {
+      if (!userControl) return;
+      var rect = el.getBoundingClientRect();
+      var rel = (e.clientY - rect.top) / rect.height;
+      rightY = Math.max(paddleH / 2, Math.min(H - paddleH / 2, rel * H));
+    });
+
+    var reduced = (window.Anim && Anim.reduced && Anim.reduced());
+
+    function tick() {
+      // Ball
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+      if (ball.y < 0) { ball.y = 0; ball.vy = -ball.vy; }
+      if (ball.y > H - 1) { ball.y = H - 1; ball.vy = -ball.vy; }
+      // AI paddles
+      var lerp = 0.2;
+      leftY += ((ball.y) - leftY) * lerp;
+      if (!userControl) rightY += ((ball.y) - rightY) * lerp;
+      // Bounce off paddles
+      if (ball.x < 1.2) {
+        if (Math.abs(ball.y - leftY) < paddleH / 2) {
+          ball.vx = Math.abs(ball.vx);
+        } else {
+          ball.x = W / 2; ball.y = H / 2; ball.vx = 0.6; ball.vy = (Math.random() - 0.5) * 0.8;
+        }
+      }
+      if (ball.x > W - 1.2) {
+        if (Math.abs(ball.y - rightY) < paddleH / 2) {
+          ball.vx = -Math.abs(ball.vx);
+        } else {
+          ball.x = W / 2; ball.y = H / 2; ball.vx = -0.6; ball.vy = (Math.random() - 0.5) * 0.8;
+        }
+      }
+    }
+
+    function render() {
+      var rows = [];
+      for (var y = 0; y < H; y++) {
+        var row = '';
+        for (var x = 0; x < W; x++) {
+          if (x === 0 && Math.abs(y - leftY) < paddleH / 2) row += '|';
+          else if (x === W - 1 && Math.abs(y - rightY) < paddleH / 2) row += '|';
+          else if (Math.round(ball.x) === x && Math.round(ball.y) === y) row += 'o';
+          else if (x === Math.floor(W / 2) && y % 2 === 0) row += ':';
+          else row += ' ';
+        }
+        rows.push(row);
+      }
+      pre.textContent = rows.join('\n');
+    }
+
+    if (reduced) {
+      render();
+      pre.textContent += '\n  (paused — motion off)';
+    } else {
+      var iv = setInterval(function () { tick(); render(); }, 80);
+      startedTimers.push(iv);
+      el._destroy = function () { clearInterval(iv); };
+      render();
+    }
+    return el;
+  }
+
+  var BUILDERS = { clock: buildClock, sysinfo: buildSysinfo, quote: buildQuote, pong: buildPong };
 
   function attachDrag(el, key) {
     var dragging = false;
@@ -177,5 +257,40 @@
     setTimeout(init, 200);
   }
 
-  window.Widgets = { init: init };
+  function add(key, type, cfg) {
+    if (registry[key]) return;
+    registry[key] = Object.assign({ enabled: true, x: null, y: 120, type: type }, cfg || {});
+    placeWidget(key, registry[key]);
+    save();
+  }
+
+  function remove(key) {
+    var el = elements[key];
+    if (el) {
+      if (el._destroy) el._destroy();
+      if (el.parentNode) el.parentNode.removeChild(el);
+      delete elements[key];
+    }
+    delete registry[key];
+    save();
+  }
+
+  function unlockPong() {
+    if (window.Session && Session.set) Session.set('pongUnlocked', true);
+    if (!registry['pong']) add('pong', 'pong', { x: 60, y: 120 });
+  }
+
+  function isPongUnlocked() {
+    return !!(window.Session && Session.get && Session.get('pongUnlocked'));
+  }
+
+  window.Widgets = { init: init, add: add, remove: remove, unlockPong: unlockPong, isPongUnlocked: isPongUnlocked, types: function () { return Object.keys(BUILDERS); } };
 })();
+
+// /pong command — direct unlock + add
+if (typeof registerCommand === 'function') {
+  registerCommand('/pong', '', function (terminal) {
+    if (window.Widgets && Widgets.unlockPong) Widgets.unlockPong();
+    if (terminal && terminal.output) terminal.output('pong widget unlocked. right-click desktop → Add widget ▸ Pong.', 'dim');
+  }, true);
+}

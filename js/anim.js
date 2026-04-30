@@ -202,6 +202,48 @@
 
   function setTestMode(b) { testMode = !!b; }
 
+  /**
+   * Typewriter — char-by-char text reveal. Returns Promise that resolves when done.
+   * `el.textContent` is set; final value = full text. Reduced motion = instant set.
+   */
+  function typewriter(el, text, opts) {
+    el = ensureEl(el);
+    if (!el || text == null) return Promise.resolve();
+    text = String(text);
+    opts = opts || {};
+    var dur = opts.dur != null ? opts.dur : 600;
+    if (reduced() || testMode) {
+      el.textContent = text;
+      return Promise.resolve();
+    }
+    var step = Math.max(8, Math.floor(dur / Math.max(1, text.length)));
+    el.textContent = '';
+    return new Promise(function (resolve) {
+      var i = 0;
+      var t = setInterval(function () {
+        i++;
+        el.textContent = text.slice(0, i);
+        if (i >= text.length) { clearInterval(t); resolve(); }
+      }, step);
+    });
+  }
+
+  /**
+   * Glitch — short RGB-split / jitter pass for ~200ms. Adds a class that the CSS
+   * keyframes hook into; removes it on resolve.
+   */
+  function glitch(el, opts) {
+    el = ensureEl(el);
+    if (!el) return Promise.resolve();
+    opts = opts || {};
+    var dur = opts.dur != null ? opts.dur : 200;
+    if (reduced() || testMode) return Promise.resolve();
+    el.classList.add('anim-glitch');
+    return new Promise(function (resolve) {
+      setTimeout(function () { el.classList.remove('anim-glitch'); resolve(); }, dur);
+    });
+  }
+
   window.Anim = {
     scaleIn: scaleIn,
     scaleOut: scaleOut,
@@ -214,6 +256,8 @@
     genie: genie,
     ungenie: ungenie,
     slideIn: slideIn,
+    typewriter: typewriter,
+    glitch: glitch,
     reduced: reduced,
     setTestMode: setTestMode
   };

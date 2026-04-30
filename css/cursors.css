@@ -22,10 +22,31 @@
 .desktop-icon.dragging,
 .os-window.dragging .os-window-titlebar { cursor: grabbing; }
 
+/* Global drag state — set on <body> so cursor follows the pointer everywhere */
+body.dragging,
+body.dragging * { cursor: grabbing !important; }
+
+/* Global resize state — same idea while a resize is in flight */
+body.resizing-n,  body.resizing-n  * { cursor: ns-resize !important; }
+body.resizing-s,  body.resizing-s  * { cursor: ns-resize !important; }
+body.resizing-e,  body.resizing-e  * { cursor: ew-resize !important; }
+body.resizing-w,  body.resizing-w  * { cursor: ew-resize !important; }
+body.resizing-ne, body.resizing-ne * { cursor: nesw-resize !important; }
+body.resizing-sw, body.resizing-sw * { cursor: nesw-resize !important; }
+body.resizing-nw, body.resizing-nw * { cursor: nwse-resize !important; }
+body.resizing-se, body.resizing-se * { cursor: nwse-resize !important; }
+
+/* Busy state */
+body.busy,
+body.busy * { cursor: wait !important; }
+
 button[disabled],
+[aria-disabled="true"],
 .disabled,
 .context-menu-item.disabled { cursor: not-allowed; }
 
+.os-window.loading,
+.os-window.loading iframe,
 .os-window-loading,
 .loading { cursor: wait; }
 

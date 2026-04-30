@@ -94,3 +94,113 @@
   #boot-splash .splash-line { animation: none; }
   #desktop-pane.booting { opacity: 1; }
 }
+
+/* GRUB stub — sprint E E10 */
+#boot-splash.grub {
+  font-family: 'Courier New', 'JetBrains Mono', monospace;
+}
+#boot-splash.grub .grub-header {
+  border-bottom: 1px solid var(--color-primary);
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+#boot-splash.grub .grub-menu {
+  margin: 12px 0;
+}
+#boot-splash.grub .grub-row {
+  padding: 4px 12px;
+  white-space: pre;
+}
+#boot-splash.grub .grub-row.selected {
+  background: var(--color-primary);
+  color: var(--color-bg);
+}
+#boot-splash.grub .grub-help {
+  margin-top: 16px;
+  color: var(--color-dim);
+  font-size: 12px;
+}
+#boot-splash.grub .grub-help #grub-countdown {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-width: 1ch;
+  display: inline-block;
+}
+
+/* Anim.glitch (E09 BSOD pre-roll, E16 konami) */
+.anim-glitch {
+  animation: anim-glitch-shake 0.18s linear;
+}
+@keyframes anim-glitch-shake {
+  0%   { transform: translate(0, 0); filter: hue-rotate(0deg); }
+  25%  { transform: translate(-2px, 1px); filter: hue-rotate(40deg); }
+  50%  { transform: translate(2px, -1px); filter: hue-rotate(-30deg); }
+  75%  { transform: translate(-1px, 2px); filter: hue-rotate(20deg); }
+  100% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .anim-glitch { animation: none; }
+}
+
+/* BIOS SETUP — sprint E E11 */
+#boot-splash.bios {
+  background: #000080;
+  color: #c0c0c0;
+  font-family: 'Courier New', 'JetBrains Mono', monospace;
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+  display: flex;
+}
+#boot-splash.bios .bios-frame {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#boot-splash.bios .bios-titlebar {
+  background: #c0c0c0;
+  color: #000080;
+  padding: 6px 14px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+#boot-splash.bios .bios-tabs {
+  display: flex;
+  background: #000080;
+  border-bottom: 1px solid #c0c0c0;
+}
+#boot-splash.bios .bios-tab {
+  padding: 6px 18px;
+  cursor: default;
+}
+#boot-splash.bios .bios-tab.active {
+  background: #c0c0c0;
+  color: #000080;
+}
+#boot-splash.bios .bios-body {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+#boot-splash.bios .bios-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 12px;
+  border-bottom: 1px dotted rgba(192, 192, 192, 0.18);
+}
+#boot-splash.bios .bios-row.selected {
+  background: #c0c0c0;
+  color: #000080;
+}
+#boot-splash.bios .bios-row-label { font-weight: 700; }
+#boot-splash.bios .bios-footer {
+  background: #c0c0c0;
+  color: #000080;
+  padding: 4px 14px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}

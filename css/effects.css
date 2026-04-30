@@ -63,3 +63,51 @@
     animation: none;
   }
 }
+
+/* /clippy easter egg — sprint E E12 */
+#clippy {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 6500;
+  font-family: "JetBrains Mono", monospace;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: auto;
+}
+#clippy .clippy-bubble {
+  background: #fffbe6;
+  color: #1a1a1a;
+  border: 1px solid #d4c25c;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 240px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+#clippy .clippy-buttons {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+}
+#clippy .clippy-buttons button {
+  background: #fff;
+  border: 1px solid #888;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+#clippy .clippy-buttons button:hover { background: #eaeaea; }
+#clippy .clippy-art {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-primary);
+  background: rgba(10, 10, 10, 0.85);
+  padding: 4px 8px;
+  border-radius: 4px;
+}

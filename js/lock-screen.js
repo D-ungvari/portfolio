@@ -1,10 +1,11 @@
 /**
- * Lock screen — DavOS v4 C3.3
+ * Lock screen — DavOS v4 C3.3 + sprint E E02
  *
- * Replaces the bare sleep overlay from idle.js. Adds:
  *   - Avatar block with persona name
- *   - Two-phase: dim (60% over 800ms) → full lock (full overlay)
- *   - Wake on any input
+ *   - Two-phase: dim (idle 5min) → full lock (idle 10min or manual)
+ *   - Dim phase wakes on any input (mouse / key / touch)
+ *   - Full lock requires non-empty password input → Enter to "auth"
+ *   - Esc clears the input without unlocking
  *   - LockScreen.lock() can be called manually (Quick Settings, /lock)
  */
 (function () {
@@ -15,8 +16,14 @@
   var clockUpdater = null;
   var locked = false;
   var dimming = false;
+  var attempts = 0;
 
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function reduced() {
+    try { return !!(window.Anim && window.Anim.reduced && window.Anim.reduced()); }
+    catch (e) { return false; }
+  }
 
   function getInitials() {
     var p = (window.Persona && Persona.get) ? Persona.get() : null;
@@ -48,7 +55,7 @@
     document.body.appendChild(dimEl);
     requestAnimationFrame(function () { if (dimEl) dimEl.classList.add('visible'); });
 
-    // Bail dim on any input — user is back
+    // Dim phase still wakes on any input — user is back at their desk
     var bail = function () {
       stopDim();
       document.removeEventListener('mousemove', bail, true);
@@ -76,6 +83,7 @@
   function lock() {
     if (locked) return;
     locked = true;
+    attempts = 0;
     stopDim();
 
     lockEl = document.createElement('div');
@@ -88,8 +96,13 @@
         '<div class="lock-clock"></div>' +
         '<div class="lock-date"></div>' +
         buildAvatarBlock() +
-        '<input type="password" class="lock-input" placeholder="•••••••• (any key to unlock)" aria-label="Unlock" />' +
-        '<div class="lock-hint">screen locked. press any key.</div>' +
+        '<form class="lock-form" autocomplete="off">' +
+          '<input type="password" class="lock-input" ' +
+                  'placeholder="enter password" aria-label="Unlock password" ' +
+                  'autocomplete="off" autocorrect="off" spellcheck="false" />' +
+          '<button type="submit" class="lock-submit" aria-label="unlock">unlock</button>' +
+        '</form>' +
+        '<div class="lock-hint" aria-live="polite">enter any password to unlock</div>' +
       '</div>';
     document.body.appendChild(lockEl);
     requestAnimationFrame(function () { if (lockEl) lockEl.classList.add('visible'); });
@@ -105,35 +118,88 @@
     tickClock();
     clockUpdater = setInterval(tickClock, 1000);
 
-    document.addEventListener('keydown', wake, true);
-    document.addEventListener('mousedown', wake, true);
-    document.addEventListener('touchstart', wake, true);
+    var input = lockEl.querySelector('.lock-input');
+    var form = lockEl.querySelector('.lock-form');
+    var hint = lockEl.querySelector('.lock-hint');
 
-    // Auto-focus the input so password chars feed visual
-    setTimeout(function () {
-      var input = lockEl && lockEl.querySelector('.lock-input');
-      if (input) input.focus();
-    }, 300);
+    // Form submit / Enter — central path
+    if (form) form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      submitAttempt(input, hint);
+    });
+
+    // Esc inside the input clears, doesn't unlock
+    if (input) input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = '';
+        input.focus();
+      }
+    });
+
+    // Auto-focus the input
+    setTimeout(function () { if (input) input.focus(); }, reduced() ? 0 : 300);
   }
 
-  function wake(e) {
-    if (!locked) return;
-    // Allow Esc to clear input but not unlock immediately if user is still typing
-    if (e && e.key === 'Escape') {
-      var input = lockEl && lockEl.querySelector('.lock-input');
-      if (input && input.value) { input.value = ''; e.preventDefault(); return; }
+  function submitAttempt(input, hint) {
+    if (!input || !lockEl) return;
+    var val = input.value || '';
+
+    if (val === '') {
+      // Empty submit → shake + dry feedback. Don't unlock.
+      attempts++;
+      if (window.Anim && Anim.shake) Anim.shake(input);
+      else lockEl.classList.add('lock-shake');
+      if (hint) {
+        hint.textContent = attempts >= 1
+          ? 'try any password — this is a portfolio.'
+          : 'no password entered.';
+      }
+      setTimeout(function () { if (lockEl) lockEl.classList.remove('lock-shake'); }, 360);
+      return;
     }
+
+    // Non-empty → "authenticate" then unlock
+    attempts++;
+    input.disabled = true;
+    if (hint) hint.textContent = 'authenticating' + (reduced() ? '' : '...');
+
+    if (reduced()) {
+      finalizeUnlock();
+      return;
+    }
+
+    // Animated dot ramp ~600ms
+    var dots = 0;
+    var t = setInterval(function () {
+      if (!lockEl) { clearInterval(t); return; }
+      dots = (dots + 1) % 4;
+      if (hint) hint.textContent = 'authenticating' + new Array(dots + 1).join('.');
+    }, 150);
+
+    setTimeout(function () {
+      clearInterval(t);
+      finalizeUnlock();
+    }, 600);
+  }
+
+  function finalizeUnlock() {
+    if (!locked) return;
     locked = false;
-    document.removeEventListener('keydown', wake, true);
-    document.removeEventListener('mousedown', wake, true);
-    document.removeEventListener('touchstart', wake, true);
     if (clockUpdater) { clearInterval(clockUpdater); clockUpdater = null; }
     if (lockEl) {
       lockEl.classList.remove('visible');
       var el = lockEl;
-      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 250);
+      setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, reduced() ? 0 : 250);
       lockEl = null;
     }
+  }
+
+  // Backwards-compat: external callers (idle.js, /sleep) may call wake() to force unlock.
+  function wake() {
+    if (!locked) return;
+    finalizeUnlock();
   }
 
   function isLocked() { return locked; }
@@ -146,12 +212,7 @@
     stopDim: stopDim
   };
 
-  // /lock command registration
-  function init() {
-    if (window._terminalRef && typeof commands === 'object') {
-      // Don't override; let os-commands handle it through a registration if it exists
-    }
-  }
+  function init() {}
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

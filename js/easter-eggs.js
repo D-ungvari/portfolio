@@ -215,3 +215,198 @@ registerCommand('/git', '', function(terminal) {
   terminal.output('On branch main', 'dim');
   terminal.output('nothing to commit, portfolio is clean', 'dim');
 }, true);
+
+// =====================================================================
+// Sprint E E12 — batch of 9 new easter-egg commands
+// =====================================================================
+
+// /uname -a flavored kernel string
+registerCommand('/uname', '', function (terminal) {
+  var d = new Date().toUTCString();
+  terminal.output('DavOS 1.0.0-portfolio #1 SMP ' + d + ' x86_64 GNU/Linux-flavored', 'dim');
+}, true);
+
+// /su — su denial
+registerCommand('/su', '', function (terminal) {
+  terminal.output("su: authentication failure (visitor doesn't even have su).", 'error');
+}, true);
+
+// /eject — fake CD-tray
+registerCommand('/eject', '', function (terminal) {
+  terminal.output('device ejected.', 'dim');
+  if (window.Notify && Notify.push) {
+    Notify.push({ title: 'CD tray', body: 'tray ejected. there is no tray.' });
+  }
+}, true);
+
+// /coffee — brew animation
+registerCommand('/coffee', '', function (terminal) {
+  var stages = ['brewing.', 'brewing..', 'brewing...', 'coffee ready. you may now /code.'];
+  if (window.Anim && Anim.reduced && Anim.reduced()) {
+    for (var i = 0; i < stages.length; i++) terminal.output(stages[i], 'dim');
+    return;
+  }
+  var idx = 0;
+  function step() {
+    terminal.output(stages[idx], 'dim');
+    idx++;
+    if (idx < stages.length) setTimeout(step, 400);
+  }
+  step();
+}, true);
+
+// dave — bare name greeting
+registerCommand('dave', '', function (terminal) {
+  terminal.output("hey, that's me. type /about for the long version.", 'dim');
+}, true);
+
+// /clippy — floating Clippy
+registerCommand('/clippy', '', function (terminal) {
+  var existing = document.getElementById('clippy');
+  if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+  var c = document.createElement('div');
+  c.id = 'clippy';
+  c.innerHTML =
+    '<div class="clippy-bubble">' +
+      "It looks like you're writing a portfolio.<br>Need help?" +
+      '<div class="clippy-buttons">' +
+        '<button type="button" data-action="yes">Yes</button>' +
+        '<button type="button" data-action="no">No, leave me alone</button>' +
+      '</div>' +
+    '</div>' +
+    '<pre class="clippy-art">  ___\n /   \\\n |o o|\n | _ |\n \\___/</pre>';
+  document.body.appendChild(c);
+  function dismiss() {
+    if (window.Anim && Anim.shake) Anim.shake(c);
+    setTimeout(function () { if (c.parentNode) c.parentNode.removeChild(c); }, 320);
+  }
+  c.querySelector('[data-action="yes"]').addEventListener('click', function () {
+    if (terminal && terminal.output) terminal.output('clippy: have you tried /help?', 'dim');
+    dismiss();
+  });
+  c.querySelector('[data-action="no"]').addEventListener('click', dismiss);
+  if (terminal && terminal.output) terminal.output('clippy: at your service.', 'dim');
+}, true);
+
+// /yes — y-loop until any key
+registerCommand('/yes', '', function (terminal) {
+  if (window.Anim && Anim.reduced && Anim.reduced()) {
+    for (var i = 0; i < 6; i++) terminal.output('y');
+    terminal.output('(loop aborted under reduced motion)', 'dim');
+    return;
+  }
+  var count = 0;
+  var maxLines = 60;
+  var aborted = false;
+  function abort() {
+    aborted = true;
+    document.removeEventListener('keydown', onKey, true);
+    terminal.output('(aborted after ' + count + ' lines)', 'dim');
+  }
+  function onKey(e) {
+    if (e.key === 'Escape' || (e.ctrlKey && (e.key === 'c' || e.key === 'C'))) {
+      e.preventDefault();
+      abort();
+    }
+  }
+  document.addEventListener('keydown', onKey, true);
+  function tick() {
+    if (aborted) return;
+    terminal.output('y');
+    count++;
+    if (count >= maxLines) { abort(); return; }
+    setTimeout(tick, 50);
+  }
+  tick();
+}, true);
+
+// /figlet <text> — block-letter ASCII banner via prefix dispatch
+(function () {
+  var FONT = {
+    'A': ['  *  ', ' * * ', '*****', '*   *', '*   *'],
+    'B': ['**** ', '*   *', '**** ', '*   *', '**** '],
+    'C': [' ****', '*    ', '*    ', '*    ', ' ****'],
+    'D': ['**** ', '*   *', '*   *', '*   *', '**** '],
+    'E': ['*****', '*    ', '**** ', '*    ', '*****'],
+    'F': ['*****', '*    ', '**** ', '*    ', '*    '],
+    'G': [' ****', '*    ', '*  **', '*   *', ' ****'],
+    'H': ['*   *', '*   *', '*****', '*   *', '*   *'],
+    'I': ['*****', '  *  ', '  *  ', '  *  ', '*****'],
+    'J': ['*****', '   * ', '   * ', '*  * ', ' **  '],
+    'K': ['*   *', '*  * ', '***  ', '*  * ', '*   *'],
+    'L': ['*    ', '*    ', '*    ', '*    ', '*****'],
+    'M': ['*   *', '** **', '* * *', '*   *', '*   *'],
+    'N': ['*   *', '**  *', '* * *', '*  **', '*   *'],
+    'O': [' *** ', '*   *', '*   *', '*   *', ' *** '],
+    'P': ['**** ', '*   *', '**** ', '*    ', '*    '],
+    'Q': [' *** ', '*   *', '*   *', '*  **', ' ****'],
+    'R': ['**** ', '*   *', '**** ', '*  * ', '*   *'],
+    'S': [' ****', '*    ', ' *** ', '    *', '**** '],
+    'T': ['*****', '  *  ', '  *  ', '  *  ', '  *  '],
+    'U': ['*   *', '*   *', '*   *', '*   *', ' *** '],
+    'V': ['*   *', '*   *', '*   *', ' * * ', '  *  '],
+    'W': ['*   *', '*   *', '* * *', '** **', '*   *'],
+    'X': ['*   *', ' * * ', '  *  ', ' * * ', '*   *'],
+    'Y': ['*   *', ' * * ', '  *  ', '  *  ', '  *  '],
+    'Z': ['*****', '   * ', '  *  ', ' *   ', '*****'],
+    '0': [' *** ', '*  **', '* * *', '**  *', ' *** '],
+    '1': ['  *  ', ' **  ', '  *  ', '  *  ', '*****'],
+    '2': [' *** ', '*   *', '   * ', '  *  ', '*****'],
+    '3': ['**** ', '    *', ' *** ', '    *', '**** '],
+    '4': ['*  * ', '*  * ', '*****', '   * ', '   * '],
+    '5': ['*****', '*    ', '**** ', '    *', '**** '],
+    '6': [' *** ', '*    ', '**** ', '*   *', ' *** '],
+    '7': ['*****', '    *', '   * ', '  *  ', '  *  '],
+    '8': [' *** ', '*   *', ' *** ', '*   *', ' *** '],
+    '9': [' *** ', '*   *', ' ****', '    *', ' *** '],
+    ' ': ['     ', '     ', '     ', '     ', '     ']
+  };
+
+  registerCommandPrefix('/figlet', function (terminal, rest) {
+    if (!rest) {
+      terminal.output('usage: /figlet <text>', 'dim');
+      return;
+    }
+    var input = rest.toUpperCase().slice(0, 12);
+    var rows = ['', '', '', '', ''];
+    for (var i = 0; i < input.length; i++) {
+      var ch = FONT[input.charAt(i)];
+      if (!ch) ch = FONT[' '];
+      for (var r = 0; r < 5; r++) rows[r] += ch[r] + ' ';
+    }
+    for (var k = 0; k < rows.length; k++) terminal.output(rows[k], 'ascii');
+    if (rest.length > 12) terminal.output('(truncated to 12 chars)', 'dim');
+  });
+})();
+
+// /sudo make me a sandwich (xkcd 149) — prefix dispatch on /sudo
+registerCommandPrefix('/sudo', function (terminal, rest) {
+  if (rest === 'make me a sandwich') {
+    terminal.output('okay.', 'dim');
+    return;
+  }
+  terminal.output("permission denied. you're a visitor, not root.", 'error');
+});
+
+// Bump /credits easter-egg count line
+registerCommand('/credits', '', function (terminal) {
+  terminal.outputLines([
+    '',
+    '  CREDITS',
+    SEPARATOR,
+    '',
+    '  design & code    David Ungvari',
+    '  font             JetBrains Mono',
+    '  hosting          GitHub Pages',
+    '  framework        none (vanilla js)',
+    '  dependencies     0',
+    '  lines of CSS     ~3000',
+    '  easter eggs      yes',
+    '  hidden games     2 (try /snake, type konami)',
+    '',
+    "  built with vanilla javascript.",
+    '',
+    SEPARATOR,
+    ''
+  ]);
+}, true);

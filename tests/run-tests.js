@@ -16,6 +16,26 @@ function readFile(filePath) {
 // Build the HTML with all scripts inline
 const htmlContent = readFile(path.join(basePath, 'tests', 'index.html'));
 
+// Parity check: every <script src="js/..."> in index.html must be in the
+// `scripts` list below (or be main.js, which is intentionally skipped —
+// it constructs a real Terminal that conflicts with the test harness).
+function assertScriptParity(loaded) {
+  const indexHtml = readFile(path.join(basePath, 'index.html'));
+  const re = /<script\s+src="js\/([^"]+)"/g;
+  const declared = [];
+  let m;
+  while ((m = re.exec(indexHtml)) !== null) declared.push(m[1]);
+  const loadedSet = new Set(loaded.map(p => {
+    const tail = p.split(/[\\/]js[\\/]/)[1];
+    return tail ? tail.replace(/\\/g, '/') : null;
+  }).filter(Boolean));
+  const missing = declared.filter(d => d !== 'main.js' && !loadedSet.has(d));
+  if (missing.length) {
+    console.error('Test runner missing scripts from index.html:', missing);
+    process.exit(2);
+  }
+}
+
 // Create a JSDOM instance.
 // Use a 1280x800 viewport so window.innerWidth >= the splitter's
 // 1024px desktop breakpoint — required for tests-os.js splitter tests.
@@ -67,8 +87,12 @@ window.matchMedia = function(query) {
 // not ship fetch depending on version — making the policy explicit here.
 window.fetch = function () { return Promise.reject(new Error('fetch disabled in tests')); };
 
-// Load scripts in order — must match tests/index.html / index.html.
+// Load scripts in order — must match index.html. main.js is intentionally
+// skipped: it constructs a real Terminal on DOMContentLoaded and runs the
+// boot sequence, conflicting with the test harness's own mock terminal.
 const scripts = [
+  path.join(basePath, 'js', 'anim.js'),
+  path.join(basePath, 'js', 'desktop-layer.js'),
   path.join(basePath, 'js', 'persona-data.js'),
   path.join(basePath, 'js', 'persona.js'),
   path.join(basePath, 'js', 'session-store.js'),
@@ -82,19 +106,31 @@ const scripts = [
   path.join(basePath, 'js', 'projects.js'),
   path.join(basePath, 'js', 'game-overlay.js'),
   path.join(basePath, 'js', 'easter-eggs.js'),
+  path.join(basePath, 'js', 'bsod.js'),
   path.join(basePath, 'js', 'themes.js'),
   path.join(basePath, 'js', 'matrix.js'),
+  path.join(basePath, 'js', 'snake.js'),
   path.join(basePath, 'js', 'extras.js'),
   path.join(basePath, 'js', 'icon.js'),
   path.join(basePath, 'js', 'desktop.js'),
   path.join(basePath, 'js', 'context-menu.js'),
   path.join(basePath, 'js', 'taskbar.js'),
+  path.join(basePath, 'js', 'pinned-apps.js'),
+  path.join(basePath, 'js', 'launcher.js'),
+  path.join(basePath, 'js', 'tray-popouts.js'),
+  path.join(basePath, 'js', 'quick-settings.js'),
+  path.join(basePath, 'js', 'lock-screen.js'),
+  path.join(basePath, 'js', 'login-screen.js'),
+  path.join(basePath, 'js', 'widgets.js'),
+  path.join(basePath, 'js', 'parallax.js'),
+  path.join(basePath, 'js', 'lasso.js'),
   path.join(basePath, 'js', 'os-commands.js'),
   path.join(basePath, 'js', 'apps', 'settings.js'),
   path.join(basePath, 'js', 'apps', 'mail.js'),
   path.join(basePath, 'js', 'apps', 'cv-viewer.js'),
   path.join(basePath, 'js', 'apps', 'apps-grid.js'),
   path.join(basePath, 'js', 'apps', 'boring-view.js'),
+  path.join(basePath, 'js', 'apps', 'files.js'),
   path.join(basePath, 'js', 'app-commands.js'),
   path.join(basePath, 'js', 'lore.js'),
   path.join(basePath, 'js', 'fs.js'),
@@ -115,6 +151,8 @@ const scripts = [
   path.join(testPath, 'tests-v8.js'),
   path.join(testPath, 'tests-os.js'),
 ];
+
+assertScriptParity(scripts);
 
 for (const scriptPath of scripts) {
   const code = readFile(scriptPath);

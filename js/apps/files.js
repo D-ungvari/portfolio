@@ -115,9 +115,75 @@
           item.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') openItem(current, name, child);
           });
+          item.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showItemContextMenu(e.clientX, e.clientY, current, name, child);
+          });
           grid.appendChild(item);
         })(keys[i]);
       }
+    }
+
+    function isTextLike(name, node) {
+      if (node.type === 'dir') return false;
+      if (node.kind === 'app') return false;
+      if (/\.(txt|md|log|json|conf)$/i.test(name)) return true;
+      // Persona-backed kinds are also viewable
+      return /^(about|contact|resume|doc|secret)$/.test(node.kind || '');
+    }
+
+    function showItemContextMenu(x, y, parent, name, node) {
+      var menu = document.createElement('div');
+      menu.className = 'context-menu files-ctx';
+      menu.style.position = 'fixed';
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      menu.style.zIndex = (window.Layer && Layer.CONTEXT_MENU) || 5000;
+
+      var items = [];
+      if (node.type === 'dir') {
+        items.push({ label: 'Open', action: function () { openItem(parent, name, node); } });
+      } else if (node.kind === 'app') {
+        items.push({ label: 'Launch', action: function () { openItem(parent, name, node); } });
+      } else if (isTextLike(name, node)) {
+        items.push({ label: 'Open in viewer', action: function () { openText(name, node); } });
+      }
+      items.push({ label: 'Properties', action: function () {
+        var size = node.type === 'dir'
+          ? (node.children ? Object.keys(node.children).length + ' items' : '0 items')
+          : '~' + Math.max(1, ((node.kind || name).length * 12)) + ' bytes';
+        var msg = name + '\nType: ' + (node.type === 'dir' ? 'Directory' : (node.kind || 'file')) +
+                  '\nSize: ' + size + '\nLocation: ' + parent;
+        if (window.Notify && Notify.push) Notify.push({ title: 'Properties', body: msg });
+        else alert(msg);
+      }});
+
+      for (var i = 0; i < items.length; i++) {
+        (function (it) {
+          var row = document.createElement('button');
+          row.type = 'button';
+          row.className = 'context-menu-item';
+          row.textContent = it.label;
+          row.addEventListener('click', function () {
+            try { it.action(); } finally { closeMenu(); }
+          });
+          menu.appendChild(row);
+        })(items[i]);
+      }
+
+      function closeMenu() {
+        if (menu.parentNode) menu.parentNode.removeChild(menu);
+        document.removeEventListener('mousedown', onAway, true);
+      }
+      function onAway(ev) {
+        if (!menu.contains(ev.target)) closeMenu();
+      }
+      document.body.appendChild(menu);
+      // Defer so the right-click event itself doesn't immediately close it.
+      setTimeout(function () {
+        document.addEventListener('mousedown', onAway, true);
+      }, 0);
     }
 
     function openItem(parent, name, node) {
@@ -137,13 +203,13 @@
         return;
       }
       // Text-like content — show in mini text window
-      if (window.TextViewer && TextViewer.open) {
+      if (isTextLike(name, node) && window.TextViewer && TextViewer.open) {
         TextViewer.open(name, node);
-      } else {
-        // Fallback: dispatch via terminal cat
-        if (window._terminalRef && typeof executeCommand === 'function') {
-          executeCommand('/cat ' + name, window._terminalRef);
-        }
+        return;
+      }
+      // Fallback: dispatch via terminal cat
+      if (window._terminalRef && typeof executeCommand === 'function') {
+        executeCommand('/cat ' + name, window._terminalRef);
       }
     }
 
@@ -262,6 +328,10 @@
     } else if (node.kind === 'doc' && node.project) {
       var pp = node.project;
       text = '# ' + pp.title + '\n\n' + (pp.tagline || '') + '\n\nStack: ' + (pp.stack || 'n/a') + '\n\nLive: ' + pp.liveUrl + '\nSource: ' + pp.sourceUrl;
+    } else if (node.kind === 'secret') {
+      text = node.content || '(redacted)';
+    } else if (node.content) {
+      text = node.content;
     } else {
       text = '(empty)';
     }

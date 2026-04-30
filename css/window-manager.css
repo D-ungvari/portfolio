@@ -260,6 +260,28 @@
 .os-window-resize.se { bottom: 0; right: 0; width: 8px; height: 8px; cursor: se-resize; }
 .os-window-resize.sw { bottom: 0; left: 0; width: 8px; height: 8px; cursor: sw-resize; }
 
+/* Hover affordance — E07: theme-color highlight on the 8 resize zones */
+.os-window-resize.n:hover,
+.os-window-resize.s:hover {
+  background: linear-gradient(to bottom, transparent, rgba(74, 246, 38, 0.20), transparent);
+}
+.os-window-resize.e:hover,
+.os-window-resize.w:hover {
+  background: linear-gradient(to right, transparent, rgba(74, 246, 38, 0.20), transparent);
+}
+.os-window-resize.ne:hover,
+.os-window-resize.nw:hover,
+.os-window-resize.se:hover,
+.os-window-resize.sw:hover {
+  background: radial-gradient(circle at center, rgba(74, 246, 38, 0.30), transparent 70%);
+}
+
+/* Active resize — keep the highlight visible during the drag */
+.os-window.resizing .os-window-resize.n:hover,
+.os-window.resizing .os-window-resize.s:hover { background: linear-gradient(to bottom, transparent, rgba(74, 246, 38, 0.40), transparent); }
+.os-window.resizing .os-window-resize.e:hover,
+.os-window.resizing .os-window-resize.w:hover { background: linear-gradient(to right, transparent, rgba(74, 246, 38, 0.40), transparent); }
+
 .os-window.dragging,
 .os-window.resizing {
   transition: none;

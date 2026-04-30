@@ -193,3 +193,64 @@ T.describe('Mobile Command Chips — Extended', function() {
     }
   });
 });
+
+// ========================================
+// E05 — Notification Center
+// ========================================
+T.describe('Notification Center — E05', function () {
+  function clean() {
+    var c = document.getElementById('notify-center');
+    if (c && c.parentNode) c.parentNode.removeChild(c);
+    if (Notify.setDnd) Notify.setDnd(false);
+  }
+
+  T.it('Notify.toggleCenter exposes API', function () {
+    T.assertType(Notify.toggleCenter, 'function');
+    T.assertType(Notify.setDnd, 'function');
+    T.assertType(Notify.isDnd, 'function');
+  });
+
+  T.it('toggleCenter creates #notify-center', function () {
+    clean();
+    Notify.toggleCenter();
+    T.assertNotNull(document.getElementById('notify-center'));
+    clean();
+  });
+
+  T.it('Today section renders for fresh notifications', function () {
+    clean();
+    Notify.push({ title: 'Test 1', body: 'hello' });
+    Notify.toggleCenter();
+    var groups = document.querySelectorAll('#notify-center .notify-center-group');
+    var hasToday = false;
+    groups.forEach(function (g) { if (g.textContent === 'Today') hasToday = true; });
+    T.assertTrue(hasToday, 'Today group present');
+    clean();
+  });
+
+  T.it('DND skips toast surface but still logs', function () {
+    clean();
+    Notify.setDnd(true);
+    var beforeToasts = document.querySelectorAll('.notify-toast').length;
+    var beforeLog = Notify.log().length;
+    Notify.push({ title: 'silenced', body: 'should not toast' });
+    var afterToasts = document.querySelectorAll('.notify-toast').length;
+    var afterLog = Notify.log().length;
+    T.assertEqual(afterToasts, beforeToasts, 'no new toast');
+    T.assertEqual(afterLog, beforeLog + 1, 'log entry added');
+    Notify.setDnd(false);
+    clean();
+  });
+
+  T.it('Clear all empties log', function () {
+    clean();
+    Notify.push({ title: 'one' });
+    Notify.push({ title: 'two' });
+    Notify.toggleCenter();
+    var clearBtn = document.querySelector('#notify-center .notify-center-clear');
+    T.assertNotNull(clearBtn);
+    clearBtn.click();
+    T.assertEqual(Notify.log().length, 0);
+    clean();
+  });
+});

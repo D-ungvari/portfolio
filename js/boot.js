@@ -111,9 +111,11 @@ function runBoot(terminal, callback) {
 
   // State tracking — prevent double-fire if skipped mid-flight
   var skipped = false;
+  var grubStarted = false;
   var stage2Started = false;
   var finished = false;
   var stage1Timer = null;
+  var grubTimers = [];
   var stage2Timers = [];
   var finalTimer = null;
   var lineIndex = 0;
@@ -126,6 +128,8 @@ function runBoot(terminal, callback) {
       }
       stage1PostTimers = [];
     }
+    for (var g = 0; g < grubTimers.length; g++) clearTimeout(grubTimers[g]);
+    grubTimers = [];
     for (var t = 0; t < stage2Timers.length; t++) {
       clearTimeout(stage2Timers[t]);
     }
@@ -211,9 +215,39 @@ function runBoot(terminal, callback) {
     }
   }
 
+  function startGrub() {
+    if (grubStarted || skipped || finished) return;
+    grubStarted = true;
+    if (!splash || !splash.parentNode) { startStage2(); return; }
+    splash.classList.add('grub');
+    splash.innerHTML =
+      '<div class="grub-header">GNU GRUB  version 2.06</div>' +
+      '<div class="grub-menu">' +
+        '<div class="grub-row selected">*DavOS 1.0 (default)</div>' +
+        '<div class="grub-row"> DavOS 1.0 (recovery mode)</div>' +
+        '<div class="grub-row"> Memtest86+</div>' +
+      '</div>' +
+      '<div class="grub-help">Use ↑/↓ keys. Default boots in <span id="grub-countdown">3</span>.</div>' +
+      '<div class="splash-skip">press any key to skip</div>';
+    var n = 3;
+    function tick() {
+      if (skipped || finished) return;
+      n--;
+      var cd = document.getElementById('grub-countdown');
+      if (cd) cd.textContent = String(Math.max(0, n));
+      if (n <= 0) { startStage2(); return; }
+      var t = setTimeout(tick, 250);
+      grubTimers.push(t);
+    }
+    var t0 = setTimeout(tick, 250);
+    grubTimers.push(t0);
+  }
+
   function startStage2() {
     if (stage2Started) return;
     stage2Started = true;
+    // Reset the splash to its booting look so systemd lines stream cleanly
+    if (splash && splash.parentNode) splash.classList.remove('grub');
 
     function streamNextLine() {
       if (skipped || finished) return;
@@ -237,14 +271,53 @@ function runBoot(terminal, callback) {
     finishBoot();
   }
 
+  // E11 — DEL during POST opens BIOS SETUP. Listener active only during the
+  // POST window; detached the moment we leave stage 1.
+  var biosListener = function (e) {
+    if (e.key !== 'Delete' && e.key !== 'F2') return;
+    if (skipped || finished || stage2Started || grubStarted) return;
+    if (window.Anim && Anim.reduced && Anim.reduced()) return;
+    e.preventDefault();
+    document.removeEventListener('keydown', biosListener, true);
+    enterBIOS();
+  };
+  document.addEventListener('keydown', biosListener, true);
+
+  function enterBIOS() {
+    // Pause POST animation
+    clearAllTimers();
+    if (!splash || !splash.parentNode) return;
+    splash.classList.add('bios');
+    splash.innerHTML = '';
+    var ui = renderBiosSetup(splash, function exitBack() {
+      // Restore stage1 splash, then proceed straight to GRUB
+      if (splash && splash.parentNode) {
+        splash.classList.remove('bios');
+        splash.innerHTML = '';
+        renderStage1Splash(splash);
+        // Skip ahead to GRUB
+        startGrub();
+      }
+      document.addEventListener('keydown', onSkip, true);
+      if (splash) splash.addEventListener('click', onSkip, true);
+    });
+    // Detach normal skip listeners while BIOS is up
+    detachSkipListeners();
+  }
+
   document.addEventListener('keydown', onSkip, true);
   splash.addEventListener('click', onSkip, true);
 
-  // Stage 1 → Stage 2 transition at 800ms
+  // After GRUB starts (or POST window passes) detach BIOS listener
+  setTimeout(function () {
+    document.removeEventListener('keydown', biosListener, true);
+  }, 850);
+
+  // Stage 1 → GRUB transition at 800ms; GRUB → Stage 2 after countdown
   stage1Timer = setTimeout(function() {
     stage1Timer = null;
     if (skipped || finished) return;
-    startStage2();
+    startGrub();
   }, 800);
 }
 
@@ -295,6 +368,106 @@ function streamPostLines(logEl) {
     })(lines[i]);
   }
   return timers;
+}
+
+/**
+ * BIOS SETUP — sprint E E11. Renders a fake AMI/Phoenix-ish 4-tab UI inside
+ * the supplied container element. Returns a small handle exposing exit().
+ *
+ * Captures keyboard navigation: ←/→ tabs, ↑/↓ rows, +/- modify (cosmetic),
+ * Esc exits via `onExit` callback.
+ */
+function renderBiosSetup(container, onExit) {
+  var TABS = [
+    { id: 'main', label: 'Main', items: [
+      { label: 'System Time',     value: '13:37:00' },
+      { label: 'System Date',     value: '04/29/2026' },
+      { label: 'BIOS Version',    value: 'DavOS BIOS v1.0' },
+      { label: 'Memory',          value: '262144K' },
+      { label: 'Coffee Level',    value: 'Critical' }
+    ]},
+    { id: 'advanced', label: 'Advanced', items: [
+      { label: 'CPU Configuration',    value: '▸' },
+      { label: 'SATA Configuration',   value: '▸' },
+      { label: 'USB Configuration',    value: '▸' },
+      { label: 'Snark Mode',           value: '[Enabled]' },
+      { label: 'Daylight Saving',      value: '[Whatever]' }
+    ]},
+    { id: 'boot', label: 'Boot', items: [
+      { label: '1st Boot Device',  value: 'DavOS HDD' },
+      { label: '2nd Boot Device',  value: 'USB' },
+      { label: '3rd Boot Device',  value: 'Network' },
+      { label: '4th Boot Device',  value: 'Coffee Maker' },
+      { label: 'Boot Speed',       value: '[Caffeinated]' }
+    ]},
+    { id: 'exit', label: 'Exit', items: [
+      { label: 'Save Changes and Exit',     action: true },
+      { label: 'Discard Changes and Exit',  action: true },
+      { label: 'Restore Defaults',          action: true }
+    ]}
+  ];
+  var tabIdx = 0;
+  var rowIdx = 0;
+
+  function render() {
+    var tabRow = '';
+    for (var t = 0; t < TABS.length; t++) {
+      tabRow += '<span class="bios-tab' + (t === tabIdx ? ' active' : '') + '">' + TABS[t].label + '</span>';
+    }
+    var rows = '';
+    var items = TABS[tabIdx].items;
+    for (var i = 0; i < items.length; i++) {
+      var sel = i === rowIdx ? ' selected' : '';
+      rows += '<div class="bios-row' + sel + '">' +
+              '<span class="bios-row-label">' + items[i].label + '</span>' +
+              '<span class="bios-row-value">' + (items[i].value || '') + '</span>' +
+              '</div>';
+    }
+    container.innerHTML =
+      '<div class="bios-frame">' +
+        '<div class="bios-titlebar">DavOS BIOS Setup Utility</div>' +
+        '<div class="bios-tabs">' + tabRow + '</div>' +
+        '<div class="bios-body">' + rows + '</div>' +
+        '<div class="bios-footer">' +
+          '<span>↑↓ Select</span>' +
+          '<span>←→ Tab</span>' +
+          '<span>+/- Modify</span>' +
+          '<span>Enter Confirm</span>' +
+          '<span>ESC Exit</span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  function onKey(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      cleanup();
+      if (onExit) onExit();
+      return;
+    }
+    if (e.key === 'ArrowLeft')  { tabIdx = (tabIdx - 1 + TABS.length) % TABS.length; rowIdx = 0; e.preventDefault(); render(); }
+    else if (e.key === 'ArrowRight') { tabIdx = (tabIdx + 1) % TABS.length; rowIdx = 0; e.preventDefault(); render(); }
+    else if (e.key === 'ArrowUp')   { rowIdx = (rowIdx - 1 + TABS[tabIdx].items.length) % TABS[tabIdx].items.length; e.preventDefault(); render(); }
+    else if (e.key === 'ArrowDown') { rowIdx = (rowIdx + 1) % TABS[tabIdx].items.length; e.preventDefault(); render(); }
+    else if (e.key === 'Enter') {
+      var item = TABS[tabIdx].items[rowIdx];
+      if (item && item.action) { e.preventDefault(); cleanup(); if (onExit) onExit(); }
+    }
+  }
+
+  function cleanup() {
+    document.removeEventListener('keydown', onKey, true);
+  }
+
+  document.addEventListener('keydown', onKey, true);
+  render();
+  return { exit: function () { cleanup(); if (onExit) onExit(); } };
+}
+
+// Test hook — exposed only when running under jsdom (no `location.reload`).
+if (typeof window !== 'undefined') {
+  window.BootDebug = window.BootDebug || {};
+  window.BootDebug.renderBiosSetup = renderBiosSetup;
 }
 
 /**

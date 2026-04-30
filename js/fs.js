@@ -35,7 +35,18 @@
             'resume.txt': { type: 'file', kind: 'resume' },
             'projects': { type: 'dir', children: {} },
             'docs': { type: 'dir', children: {} },
-            '.secrets': { type: 'dir', children: {} }
+            '.secrets': { type: 'dir', children: {
+              'README.txt': { type: 'file', kind: 'secret', content:
+                "if you're reading this, you're either a recruiter who reads source\n" +
+                "or a curious visitor who knows about hidden directories.\n\n" +
+                "either way: hi. type /hire in the terminal.\n" },
+              'todo.md': { type: 'file', kind: 'secret', content:
+                "# TODO\n\n" +
+                "- [x] ship a portfolio that doesn't look like a portfolio\n" +
+                "- [x] convince at least one recruiter\n" +
+                "- [ ] add a /coffee command\n" +
+                "- [ ] sleep more\n" }
+            }}
           }}
         }}
       }

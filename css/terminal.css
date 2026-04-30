@@ -127,3 +127,75 @@
 .separator {
   color: var(--color-dim);
 }
+
+/* /htop interactive overlay — sprint E E13 */
+#htop-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.96);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--color-primary);
+  z-index: 100;
+  padding: 12px 16px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+#htop-overlay .htop-header {
+  font-weight: 700;
+  color: var(--color-bg);
+  background: var(--color-primary);
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  white-space: pre;
+  letter-spacing: 1px;
+}
+#htop-overlay .htop-row {
+  padding: 2px 8px;
+  white-space: pre;
+}
+#htop-overlay .htop-row.selected {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+#htop-overlay .htop-empty {
+  padding: 16px 8px;
+  color: var(--color-dim);
+  font-style: italic;
+}
+#htop-overlay .htop-footer {
+  position: sticky;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.9);
+  margin-top: 12px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  gap: 16px;
+  color: var(--color-dim);
+  font-size: 11px;
+}
+
+/* /snake easter egg — sprint E E14 */
+#snake-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.97);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 110;
+}
+#snake-overlay canvas {
+  border: 1px solid var(--color-primary);
+  box-shadow: 0 0 24px var(--color-glow);
+  image-rendering: pixelated;
+}
+#snake-overlay.snake-static {
+  flex-direction: column;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--color-primary);
+  text-align: center;
+}
+#snake-overlay .snake-static-msg { font-size: 16px; font-weight: 700; }
+#snake-overlay .snake-static-hint { color: var(--color-dim); font-size: 12px; margin-top: 8px; }
