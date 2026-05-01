@@ -153,22 +153,23 @@ T.describe('/help Command', function() {
 // ========================================
 
 T.describe('/about Command', function() {
-  T.it('outputs about header', function() {
+  T.it('renders neofetch markup', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/about'].handler(mock);
-    T.assertContains(mock.getAllText(), '> about');
+    T.assert(mock.getHTMLCount() > 0, 'about should render HTML');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-render');
   });
 
   T.it('mentions David Ungvari', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/about'].handler(mock);
-    T.assertContains(mock.getAllText(), 'David Ungvari');
+    T.assertContains(mock.htmlOutputLog[0].html, 'david@dave-arch');
   });
 
-  T.it('includes separator lines', function() {
+  T.it('includes Arch Linux system info', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/about'].handler(mock);
-    T.assertContains(mock.getAllText(), '────');
+    T.assertContains(mock.htmlOutputLog[0].html, 'Arch Linux x86_64');
   });
 });
 
@@ -227,8 +228,8 @@ T.describe('Projects — Data Integrity', function() {
     T.assert(Array.isArray(projects), 'projects should be an array');
   });
 
-  T.it('has exactly 7 projects', function() {
-    T.assertArrayLength(projects, 7);
+  T.it('has exactly 5 projects', function() {
+    T.assertArrayLength(projects, 5);
   });
 
   T.it('each project has required fields', function() {
@@ -387,8 +388,13 @@ T.describe('Easter Eggs', function() {
     { cmd: 'hi', contains: '/help' },
     { cmd: '/whoami', contains: 'visitor' },
     { cmd: '/vim', contains: 'exiting' },
+    { cmd: '/nvim', contains: 'NVIM' },
+    { cmd: ':q', contains: 'scratch' },
+    { cmd: ':q!', contains: 'force quit' },
+    { cmd: ':wq', contains: 'nothing written' },
     { cmd: '/emacs', contains: 'operating system' },
-    { cmd: '42', contains: 'life' }
+    { cmd: '42', contains: 'life' },
+    { cmd: 'btw', contains: 'arch btw' }
   ];
 
   for (var i = 0; i < easterEggs.length; i++) {
@@ -400,7 +406,8 @@ T.describe('Easter Eggs', function() {
       T.it(egg.cmd + ' outputs correctly', function() {
         var mock = T.createMockTerminal();
         commandRegistry[egg.cmd].handler(mock);
-        T.assertContains(mock.getAllText(), egg.contains);
+        var html = mock.htmlOutputLog.map(function (x) { return x.html; }).join('\n');
+        T.assertContains(mock.getAllText() + '\n' + html, egg.contains);
       });
 
       T.it(egg.cmd + ' is hidden', function() {
@@ -431,13 +438,13 @@ T.describe('Boot Sequence', function() {
   T.it('showWelcome outputs ASCII art', function() {
     var mock = T.createMockTerminal();
     showWelcome(mock);
-    T.assertContains(mock.getAllText(), '██');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-logo');
   });
 
-  T.it('showWelcome includes tagline', function() {
+  T.it('showWelcome includes neofetch info', function() {
     var mock = T.createMockTerminal();
     showWelcome(mock);
-    T.assertContains(mock.getAllText(), 'full-stack');
+    T.assertContains(mock.htmlOutputLog[0].html, 'Full-stack Developer');
   });
 
   T.it('showWelcome includes help hint', function() {
@@ -821,6 +828,27 @@ T.describe('DOM Structure', function() {
     T.assertContains(prompt.textContent, 'visitor@dave');
   });
 
+  T.it('prompt has two-line powerline structure', function() {
+    T.assertNotNull(document.querySelector('.prompt-top'));
+    T.assertNotNull(document.querySelector('.prompt-bottom'));
+    T.assertNotNull(document.querySelector('.prompt-user'));
+    T.assertNotNull(document.querySelector('.prompt-cwd'));
+    T.assertNotNull(document.querySelector('.prompt-git'));
+    T.assertContains(document.querySelector('.prompt-bottom').textContent, 'λ');
+  });
+
+  T.it('terminal mode indicator toggles on focus and blur', function() {
+    var terminalEl = document.getElementById('terminal');
+    new Terminal(terminalEl);
+    var mode = terminalEl.querySelector('.terminal-mode');
+    var input = document.getElementById('command-input');
+    T.assertNotNull(mode);
+    input.dispatchEvent(new window.Event('focus'));
+    T.assertContains(mode.textContent, 'INSERT');
+    input.dispatchEvent(new window.Event('blur'));
+    T.assertContains(mode.textContent, 'NORMAL');
+  });
+
   T.it('bar has 3 dots', function() {
     var dots = document.querySelectorAll('.bar-dot');
     T.assertEqual(dots.length, 3);
@@ -855,7 +883,7 @@ T.describe('Integration — Full Command Flow', function() {
     T.assertEqual(mock.getOutputCount(), 0, 'Clear should empty output');
 
     executeCommand('/about', mock);
-    T.assert(mock.getOutputCount() > 0, 'About should produce output after clear');
+    T.assert(mock.getOutputCount() > 0 || mock.getHTMLCount() > 0, 'About should produce output after clear');
   });
 
   T.it('all project commands produce output', function() {

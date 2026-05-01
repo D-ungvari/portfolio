@@ -23,7 +23,7 @@
   border-bottom: none;
   border-radius: 4px 4px 0 0;
   color: var(--color-dim);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   padding: 4px 10px;
   height: 24px;

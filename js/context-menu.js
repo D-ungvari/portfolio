@@ -187,8 +187,8 @@
           if (window.PaneToggle && PaneToggle.show) PaneToggle.show('terminal');
           if (window._terminalRef && window._terminalRef.inputEl) window._terminalRef.inputEl.focus();
         }},
-        { label: 'About this PC', action: function () {
-          if (window.Taskbar && Taskbar.showAbout) Taskbar.showAbout();
+        { label: 'Run neofetch', action: function () {
+          if (window._terminalRef && typeof executeCommand === 'function') executeCommand('/about', window._terminalRef);
         }}
       ];
       show(e.clientX, e.clientY, items);

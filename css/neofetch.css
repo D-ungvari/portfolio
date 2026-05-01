@@ -1,0 +1,62 @@
+.neofetch-render {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+  padding: 2px 0;
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+
+.neofetch-logo {
+  margin: 0;
+  color: var(--color-arch);
+  font: inherit;
+  line-height: 1.05;
+  white-space: pre;
+  flex: 0 0 auto;
+}
+
+.neofetch-info {
+  min-width: 260px;
+  color: var(--color-primary);
+  font-size: 12px;
+}
+
+.neofetch-host {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.neofetch-separator {
+  color: var(--color-dim);
+  margin-bottom: 2px;
+}
+
+.neofetch-row {
+  display: grid;
+  grid-template-columns: 74px 8px minmax(0, 1fr);
+  gap: 2px;
+}
+
+.neofetch-key,
+.neofetch-colon {
+  color: var(--color-arch);
+  font-weight: 700;
+}
+
+.neofetch-value {
+  color: var(--color-primary);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 639px) {
+  .neofetch-render {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .neofetch-info {
+    min-width: 0;
+    width: 100%;
+  }
+}

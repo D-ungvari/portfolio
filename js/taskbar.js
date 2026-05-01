@@ -1,228 +1,191 @@
 /**
- * Taskbar — live clock, theme dropdown, "About this PC" panel.
+ * Taskbar - polybar/i3-style shell bar.
  */
 (function() {
   var clockEl = null;
   var clockTimer = null;
-  var themeBtn = null;
-  var openMenu = null;
+  var statsTimer = null;
+  var statState = {
+    cpu: 12,
+    mem: 4.2,
+    ip: '192.168.1.42'
+  };
 
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
+  function formatDateTime(d) {
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+      ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+  }
+
+  function reducedMotion() {
+    return (window.Anim && Anim.reduced && Anim.reduced()) ||
+      (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
   function updateClock() {
     if (!clockEl) return;
-    var d = new Date();
-    clockEl.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    clockEl.textContent = formatDateTime(new Date());
   }
 
   function startClock() {
+    if (clockTimer) clearInterval(clockTimer);
     updateClock();
     clockTimer = setInterval(updateClock, 1000);
   }
 
-  function closeMenu() {
-    if (openMenu && openMenu.parentNode) openMenu.parentNode.removeChild(openMenu);
-    openMenu = null;
-    document.removeEventListener('click', onDocClick, true);
-    document.removeEventListener('keydown', onKeydown, true);
+  function clamp(n, min, max) {
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
   }
 
-  function onDocClick(e) {
-    if (openMenu && !openMenu.contains(e.target) && e.target !== themeBtn) closeMenu();
-  }
-  function onKeydown(e) {
-    if (e.key === 'Escape') closeMenu();
-  }
-
-  function showThemeMenu(anchor) {
-    closeMenu();
-    if (typeof themes === 'undefined') return;
-    var rect = anchor.getBoundingClientRect();
-    var menu = document.createElement('div');
-    menu.className = 'taskbar-menu';
-    menu.setAttribute('role', 'menu');
-    var names = Object.keys(themes);
-    for (var i = 0; i < names.length; i++) {
-      (function(name) {
-        var item = document.createElement('div');
-        item.className = 'taskbar-menu-item' + (name === currentTheme ? ' active' : '');
-        item.setAttribute('role', 'menuitemradio');
-        var label = document.createElement('span');
-        label.textContent = name;
-        var check = document.createElement('span');
-        check.className = 'check';
-        check.textContent = '✓';
-        item.appendChild(label);
-        item.appendChild(check);
-        item.addEventListener('click', function(ev) {
-          ev.stopPropagation();
-          if (typeof applyTheme === 'function') applyTheme(name, ev.clientX, ev.clientY);
-          if (window._terminalRef && typeof window._terminalRef.output === 'function') {
-            window._terminalRef.output('> theme set to ' + name + '.', 'accent');
-          }
-          closeMenu();
-        });
-        menu.appendChild(item);
-      })(names[i]);
-    }
-    document.body.appendChild(menu);
-    var top = rect.bottom + 4;
-    var left = rect.left;
-    if (left + menu.offsetWidth > window.innerWidth - 8) {
-      left = window.innerWidth - menu.offsetWidth - 8;
-    }
-    menu.style.left = left + 'px';
-    menu.style.top = top + 'px';
-    openMenu = menu;
-    setTimeout(function() {
-      document.addEventListener('click', onDocClick, true);
-      document.addEventListener('keydown', onKeydown, true);
-    }, 0);
+  function walkStats() {
+    if (reducedMotion()) return;
+    statState.cpu = clamp(statState.cpu + (Math.random() * 6 - 3), 5, 25);
+    statState.mem = clamp(statState.mem + (Math.random() * 0.18 - 0.09), 3.9, 4.4);
   }
 
-  // ----- About panel -----
-  var aboutOverlay = null;
-
-  function closeAbout() {
-    if (aboutOverlay && aboutOverlay.parentNode) {
-      aboutOverlay.parentNode.removeChild(aboutOverlay);
-    }
-    aboutOverlay = null;
-    document.removeEventListener('keydown', onAboutKeydown, true);
-  }
-  function onAboutKeydown(e) {
-    if (e.key === 'Escape') closeAbout();
+  function setText(selector, text) {
+    var el = document.querySelector(selector);
+    if (el) el.textContent = text;
   }
 
-  function showAbout() {
-    if (aboutOverlay) return;
-    aboutOverlay = document.createElement('div');
-    aboutOverlay.className = 'about-overlay';
-    aboutOverlay.innerHTML =
-      '<div class="about-panel" role="dialog" aria-label="About this PC">' +
-        '<button class="about-close" aria-label="Close">×</button>' +
-        '<h2>About this PC</h2>' +
-        '<div class="about-subtitle">DavOS v1.0 · running on coffee</div>' +
-        '<div class="about-section">' +
-          '<h3>OWNER</h3>' +
-          '<ul>' +
-            '<li>Dave Ungvari</li>' +
-            '<li class="dim">Full-stack developer @ Omada A/S · Copenhagen, DK</li>' +
-            '<li class="dim">Languages: English, Danish, Hungarian</li>' +
-          '</ul>' +
-        '</div>' +
-        '<div class="about-section">' +
-          '<h3>CURRENTLY SHIPPING</h3>' +
-          '<ul>' +
-            '<li>React · TypeScript · GraphQL</li>' +
-            '<li>C# · .NET · SQL Server</li>' +
-          '</ul>' +
-        '</div>' +
-        '<div class="about-section">' +
-          '<h3>RECENTLY SHIPPED (SIDE)</h3>' +
-          '<ul>' +
-            '<li>Next.js · PostgreSQL · pgvector · Claude API · RAG</li>' +
-            '<li>TypeScript · PixiJS · Vite · ECS</li>' +
-            '<li>Vanilla JS · Canvas 2D · zero deps</li>' +
-          '</ul>' +
-        '</div>' +
-        '<div class="about-section">' +
-          '<h3>CONTACT</h3>' +
-          '<ul>' +
-            '<li><a href="https://github.com/D-ungvari" target="_blank" rel="noopener">github.com/D-ungvari</a></li>' +
-            '<li><a href="https://www.linkedin.com/in/davidungvari/" target="_blank" rel="noopener">linkedin.com/in/davidungvari</a></li>' +
-            '<li><a href="mailto:qkaturo95@gmail.com">qkaturo95@gmail.com</a></li>' +
-          '</ul>' +
-        '</div>' +
-      '</div>';
-    document.body.appendChild(aboutOverlay);
-    aboutOverlay.querySelector('.about-close').addEventListener('click', closeAbout);
-    aboutOverlay.addEventListener('click', function(e) {
-      if (e.target === aboutOverlay) closeAbout();  // backdrop click
-    });
-    document.addEventListener('keydown', onAboutKeydown, true);
+  function updateStats() {
+    walkStats();
+    setText('[data-stat="cpu"]', Math.round(statState.cpu) + '%');
+    setText('[data-stat="mem"]', statState.mem.toFixed(1) + 'G');
   }
 
-  // ----- Init: build the dynamic taskbar UI -----
-  function init() {
+  function startStats() {
+    if (statsTimer) clearInterval(statsTimer);
+    updateStats();
+    if (!reducedMotion()) statsTimer = setInterval(updateStats, 2000);
+  }
+
+  function pill(className, label, value, id) {
+    return '<span' + (id ? ' id="' + id + '"' : '') + ' class="bar-pill ' + className + '">' +
+      '<span class="bar-pill-label">' + label + '</span>' +
+      '<span class="bar-pill-value">' + value + '</span>' +
+    '</span>';
+  }
+
+  function renderSystemStats(container) {
+    container.innerHTML =
+      pill('bar-pill-cpu', 'CPU', '<span data-stat="cpu">12%</span>') +
+      pill('bar-pill-mem', 'MEM', '<span data-stat="mem">4.2G</span>') +
+      '<span class="bar-pill bar-pill-net tray-item tray-net" title="Network">' +
+        '<span class="bar-pill-label">NET</span>' +
+        '<span class="bar-pill-value tray-rate">' + statState.ip + '</span>' +
+      '</span>' +
+      pill('bar-pill-kernel', 'KERNEL', '6.8.9-arch1-1') +
+      pill('bar-pill-branch', 'BRANCH', 'main') +
+      pill('bar-pill-clock', 'TIME', '', 'taskbar-clock');
     clockEl = document.getElementById('taskbar-clock');
-    var taskbarRight = document.getElementById('taskbar-right');
-    var osLabel = document.getElementById('taskbar-os-label');
+  }
 
-    // Inject theme button into #taskbar-right (before clock)
-    if (taskbarRight && clockEl) {
-      themeBtn = document.createElement('button');
-      themeBtn.id = 'taskbar-theme-btn';
-      themeBtn.type = 'button';
-      themeBtn.setAttribute('aria-haspopup', 'menu');
-      themeBtn.setAttribute('aria-label', 'Switch theme');
-      themeBtn.textContent = 'theme ▾';
-      taskbarRight.insertBefore(themeBtn, clockEl);
-      themeBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        if (openMenu) closeMenu();
-        else showThemeMenu(themeBtn);
-      });
+  function updateTitle(title) {
+    var center = document.querySelector('.bar-center');
+    if (center) center.textContent = title || '';
+  }
 
-      // System tray cluster — net rate, volume, battery, EQ
-      var tray = document.createElement('div');
-      tray.id = 'taskbar-tray';
-      tray.innerHTML =
-        '<span class="tray-item tray-net" title="Network">↑↓ <span class="tray-rate">0.0M/s</span></span>' +
-        '<span class="tray-item tray-vol" title="Volume">▮▮▮▯▯</span>' +
-        '<span class="tray-item tray-bat" title="Battery">[█████] 100%</span>' +
-        '<span class="tray-item tray-eq" title="Audio">' +
-          '<span class="bar"></span><span class="bar"></span><span class="bar"></span>' +
-          '<span class="bar"></span><span class="bar"></span><span class="bar"></span>' +
-        '</span>';
-      taskbarRight.insertBefore(tray, clockEl);
-
-      var netRateEl = tray.querySelector('.tray-rate');
-      function tickNetRate() {
-        if (!netRateEl) return;
-        var rate = (Math.random() * 3 + 0.1).toFixed(1);
-        netRateEl.textContent = rate + 'M/s';
-      }
-      setInterval(tickNetRate, 2000);
-      tickNetRate();
-
-      var bat = 100;
-      var batEl = tray.querySelector('.tray-bat');
-      function tickBat() {
-        bat = Math.max(0, bat - 1);
-        if (bat === 0) bat = 100;
-        if (!batEl) return;
-        var cells = 5;
-        var filled = Math.round((bat / 100) * cells);
-        var bar = '█'.repeat(filled) + '░'.repeat(cells - filled);
-        batEl.textContent = '[' + bar + '] ' + bat + '%';
-      }
-      setInterval(tickBat, 60000);
-
-      var bell = document.createElement('button');
-      bell.id = 'taskbar-notify-bell';
-      bell.type = 'button';
-      bell.setAttribute('aria-label', 'Notifications');
-      bell.innerHTML = '<span class="bell-icon">⌗</span><span class="notify-badge"></span>';
-      taskbarRight.insertBefore(bell, clockEl);
-      if (window.Notify) window.Notify.setBell(bell);
+  function renderWorkspaces(data) {
+    var container = document.getElementById('taskbar-workspaces');
+    if (!container) return;
+    var count = data && data.count ? data.count : 5;
+    var current = data && data.current ? data.current : 1;
+    var map = data && data.map ? data.map : {};
+    var html = '';
+    for (var i = 1; i <= count; i++) {
+      var ws = map[String(i)] || { windowIds: [], tiling: false };
+      var classes = 'bar-pill workspace-pill';
+      if (i === current) classes += ' active';
+      if (ws.windowIds && ws.windowIds.length) classes += ' has-windows';
+      if (ws.tiling) classes += ' tiling';
+      html += '<button type="button" class="' + classes + '" data-workspace="' + i + '"' +
+        (i === current ? ' aria-current="true"' : '') +
+        ' title="Workspace ' + i + '">[' + i + ']</button>';
     }
+    container.innerHTML = html;
+  }
 
-    if (osLabel) {
-      osLabel.setAttribute('role', 'button');
-      osLabel.setAttribute('tabindex', '0');
-      osLabel.setAttribute('aria-label', 'About this PC');
-      osLabel.addEventListener('click', showAbout);
-      osLabel.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showAbout(); }
-      });
+  function bindWorkspaces() {
+    var container = document.getElementById('taskbar-workspaces');
+    if (!container) return;
+    if (window.Workspaces && typeof Workspaces.snapshot === 'function') {
+      renderWorkspaces(Workspaces.snapshot());
+    } else {
+      renderWorkspaces({ current: 1, count: 5, map: { '1': { windowIds: [], tiling: false } } });
     }
+    container.addEventListener('click', function(e) {
+      var btn = e.target && e.target.closest ? e.target.closest('.workspace-pill') : null;
+      if (!btn || !container.contains(btn)) return;
+      var id = parseInt(btn.getAttribute('data-workspace'), 10);
+      if (window.Workspaces && typeof Workspaces.switchTo === 'function') Workspaces.switchTo(id);
+    });
+    if (window.Workspaces && typeof Workspaces.onChange === 'function' && !window.__taskbarWorkspacesBound) {
+      window.__taskbarWorkspacesBound = true;
+      Workspaces.onChange(renderWorkspaces);
+    }
+  }
 
+  function bindWindowTitle() {
+    if (!window.WindowManager) {
+      updateTitle('');
+      return;
+    }
+    if (typeof WindowManager.activeTitle === 'function') {
+      updateTitle(WindowManager.activeTitle());
+    }
+    if (typeof WindowManager.onActiveChange === 'function' && !window.__taskbarTitleBound) {
+      window.__taskbarTitleBound = true;
+      WindowManager.onActiveChange(function(title) { updateTitle(title); });
+    }
+  }
+
+  function openLauncher() {
+    if (window.Palette && typeof Palette.open === 'function') Palette.open();
+    else if (window.Launcher && typeof Launcher.open === 'function') Launcher.open();
+  }
+
+  function init() {
+    var taskbar = document.getElementById('taskbar');
+    if (!taskbar) return;
+
+    taskbar.innerHTML =
+      '<div class="bar-left">' +
+        '<button id="taskbar-launcher" type="button" class="bar-launcher" aria-label="Open launcher" title="Open launcher">ARCH</button>' +
+        '<div id="taskbar-workspaces" class="bar-workspaces" aria-label="Workspaces"></div>' +
+        '<div id="taskbar-running" role="toolbar" aria-label="Running applications"></div>' +
+      '</div>' +
+      '<div class="bar-center" aria-live="polite"></div>' +
+      '<div id="taskbar-right" class="bar-right">' +
+        '<div id="taskbar-tray" class="bar-stat-strip"></div>' +
+        '<button id="taskbar-notify-bell" type="button" class="bar-icon-btn" aria-label="Notifications" title="Notifications">' +
+          '<span class="bell-icon">^</span><span class="notify-badge"></span>' +
+        '</button>' +
+      '</div>';
+
+    var launcher = document.getElementById('taskbar-launcher');
+    if (launcher) launcher.addEventListener('click', openLauncher);
+
+    var stats = document.getElementById('taskbar-tray');
+    if (stats) renderSystemStats(stats);
+
+    var bell = document.getElementById('taskbar-notify-bell');
+    if (bell && window.Notify) window.Notify.setBell(bell);
+
+    bindWorkspaces();
+    bindWindowTitle();
+    startStats();
     startClock();
   }
 
   if (typeof window !== 'undefined') {
-    window.Taskbar = { init: init, showAbout: showAbout, closeAbout: closeAbout };
+    window.Taskbar = {
+      init: init,
+      renderSystemStats: renderSystemStats
+    };
     if (document.readyState !== 'loading') init();
     else document.addEventListener('DOMContentLoaded', init);
   }

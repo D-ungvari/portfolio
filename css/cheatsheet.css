@@ -18,7 +18,7 @@
   max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   box-shadow: 0 16px 48px rgba(0,0,0,0.75), 0 0 24px var(--color-glow);
 }
 #cheatsheet-header {

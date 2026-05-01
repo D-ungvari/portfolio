@@ -7,6 +7,10 @@
     registry.push(entry);
   }
 
+  function register(combo, label, group, action, when) {
+    add({ combo: combo, label: label, group: group, action: action, when: when });
+  }
+
   function list(group) {
     if (!group) return registry.slice();
     return registry.filter(function (e) { return e.group === group; });
@@ -71,5 +75,5 @@
 
   document.addEventListener('keydown', onKeydown, false);
 
-  window.Shortcuts = { add: add, list: list, registry: registry };
+  window.Shortcuts = { add: add, register: register, list: list, registry: registry };
 })();

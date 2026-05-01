@@ -296,81 +296,70 @@ T.describe('Context Menu', function() {
 // ========================================
 
 T.describe('Taskbar', function() {
-  function closeAboutOverlays() {
-    // Use the public API so the module's internal `aboutOverlay` ref is cleared.
-    if (window.Taskbar && typeof window.Taskbar.closeAbout === 'function') {
-      window.Taskbar.closeAbout();
-    }
-    var ov = document.querySelectorAll('.about-overlay');
-    for (var i = 0; i < ov.length; i++) {
-      if (ov[i].parentNode) ov[i].parentNode.removeChild(ov[i]);
-    }
-  }
-  function closeTaskbarMenus() {
-    var ms = document.querySelectorAll('.taskbar-menu');
-    for (var i = 0; i < ms.length; i++) {
-      if (ms[i].parentNode) ms[i].parentNode.removeChild(ms[i]);
-    }
-  }
-
-  T.it('Taskbar.init runs and creates #taskbar-theme-btn', function() {
+  T.it('Taskbar.init runs and creates the polybar layout', function() {
     if (window.Taskbar && typeof window.Taskbar.init === 'function') {
       window.Taskbar.init();
     }
-    var btn = document.getElementById('taskbar-theme-btn');
-    T.assertNotNull(btn);
+    T.assertNotNull(document.querySelector('.bar-left'));
+    T.assertNotNull(document.querySelector('.bar-center'));
+    T.assertNotNull(document.querySelector('.bar-right'));
+    T.assertNotNull(document.getElementById('taskbar-launcher'));
   });
 
-  T.it('#taskbar-clock matches /^\\d{2}:\\d{2}(:\\d{2})?$/ after init', function() {
+  T.it('renders five workspace pills with workspace 1 active', function() {
+    if (window.Taskbar && typeof window.Taskbar.init === 'function') {
+      window.Taskbar.init();
+    }
+    var pills = document.querySelectorAll('#taskbar-workspaces .workspace-pill');
+    T.assertEqual(pills.length, 5);
+    var pill = document.querySelector('#taskbar-workspaces .workspace-pill.active');
+    T.assertNotNull(pill);
+    T.assertEqual(pill.getAttribute('data-workspace'), '1');
+    T.assertContains(pill.textContent, '[1]');
+  });
+
+  T.it('renders six right-side system stat pills', function() {
+    if (window.Taskbar && typeof window.Taskbar.init === 'function') {
+      window.Taskbar.init();
+    }
+    var pills = document.querySelectorAll('#taskbar-tray .bar-pill');
+    T.assertEqual(pills.length, 6);
+    T.assertNotNull(document.querySelector('.bar-pill-cpu'));
+    T.assertNotNull(document.querySelector('.bar-pill-mem'));
+    T.assertNotNull(document.querySelector('.bar-pill-net'));
+    T.assertNotNull(document.querySelector('.bar-pill-kernel'));
+    T.assertNotNull(document.querySelector('.bar-pill-branch'));
+    T.assertNotNull(document.querySelector('.bar-pill-clock'));
+  });
+
+  T.it('#taskbar-clock matches YYYY-MM-DD HH:MM:SS after init', function() {
     if (window.Taskbar && typeof window.Taskbar.init === 'function') {
       window.Taskbar.init();
     }
     var clock = document.getElementById('taskbar-clock');
     T.assertNotNull(clock);
-    var ok = /^\d{2}:\d{2}(:\d{2})?$/.test(clock.textContent || '');
-    T.assertTrue(ok, 'clock text "' + clock.textContent + '" should match HH:MM or HH:MM:SS');
+    var ok = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(clock.textContent || '');
+    T.assertTrue(ok, 'clock text "' + clock.textContent + '" should match YYYY-MM-DD HH:MM:SS');
   });
 
-  T.it('clicking #taskbar-os-label opens .about-overlay with .about-panel', function() {
-    closeAboutOverlays();
+  T.it('theme dropdown and About panel are removed from the bar', function() {
     if (window.Taskbar && typeof window.Taskbar.init === 'function') {
       window.Taskbar.init();
     }
-    var label = document.getElementById('taskbar-os-label');
-    T.assertNotNull(label);
-    label.click();
-    var overlay = document.querySelector('.about-overlay');
-    T.assertNotNull(overlay);
-    var panel = overlay.querySelector('.about-panel');
-    T.assertNotNull(panel);
-    closeAboutOverlays();
+    T.assert(document.getElementById('taskbar-theme-btn') === null, 'theme button should be gone');
+    T.assert(document.querySelector('.taskbar-menu') === null, 'theme menu should be gone');
+    T.assert(document.querySelector('.about-overlay') === null, 'about overlay should not exist');
   });
 
-  T.it('clicking .about-close removes the overlay', function() {
-    closeAboutOverlays();
-    if (window.Taskbar && typeof window.Taskbar.showAbout === 'function') {
-      window.Taskbar.showAbout();
-    }
-    var closeBtn = document.querySelector('.about-close');
-    T.assertNotNull(closeBtn);
-    closeBtn.click();
-    var stillThere = document.querySelector('.about-overlay');
-    T.assert(stillThere === null, 'overlay should be removed after close click');
-  });
-
-  T.it('clicking #taskbar-theme-btn shows .taskbar-menu with one item per theme', function() {
-    closeTaskbarMenus();
+  T.it('bar center updates from active window title', function() {
     if (window.Taskbar && typeof window.Taskbar.init === 'function') {
       window.Taskbar.init();
     }
-    var btn = document.getElementById('taskbar-theme-btn');
-    T.assertNotNull(btn);
-    btn.click();
-    var menu = document.querySelector('.taskbar-menu');
-    T.assertNotNull(menu);
-    var items = menu.querySelectorAll('.taskbar-menu-item');
-    T.assertEqual(items.length, Object.keys(themes).length);
-    closeTaskbarMenus();
+    var id = WindowManager.open({ app: 'test', title: 'Polybar Test Window', content: 'ok' });
+    var center = document.querySelector('.bar-center');
+    T.assertNotNull(center);
+    T.assertContains(center.textContent, 'Polybar Test Window');
+    WindowManager.close(id);
   });
 });
 
@@ -492,12 +481,12 @@ T.describe('OS Commands — /wallpaper', function() {
     T.assertNotNull(commandRegistry['/wallpaper']);
   });
 
-  T.it('/wallpaper amber sets currentTheme to amber', function() {
-    applyTheme('green');
+  T.it('/wallpaper gruvbox sets currentTheme to gruvbox', function() {
+    applyTheme('catppuccin');
     var mock = T.createMockTerminal();
-    executeCommand('/wallpaper amber', mock);
-    T.assertEqual(currentTheme, 'amber');
-    applyTheme('green');
+    executeCommand('/wallpaper gruvbox', mock);
+    T.assertEqual(currentTheme, 'gruvbox');
+    applyTheme('catppuccin');
   });
 });
 

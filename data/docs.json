@@ -30,52 +30,6 @@
       "stack": "TypeScript, PixiJS v8, Vite, Vitest"
     }
   },
-  "/jobtracker": {
-    "title": "jobtracker — design notes",
-    "problem": "Track applications + extract structured data from job postings using LLMs without burning tokens or leaking PII.",
-    "architecture": [
-      "  Browser ──▶ Next.js API ──▶ Prisma ──▶ Postgres + pgvector",
-      "                  │                          ▲",
-      "                  ▼                          │",
-      "             Claude API ──▶ .NET extractor ──┘",
-      "             (cached)        (background queue)"
-    ],
-    "decisions": [
-      "Prompt caching on Claude — 80% cost reduction on repeated parses",
-      "pgvector + cosine similarity for semantic match",
-      ".NET 8 minimal API for the extraction queue — heavier work off Node",
-      "Dockerized end-to-end + GitHub Actions CI"
-    ],
-    "tradeoffs": [
-      "Adds .NET runtime to the stack — justified by extraction throughput",
-      "Cache invalidation on prompt changes is manual — acceptable at this scale"
-    ],
-    "metrics": {
-      "loc": "~6000",
-      "stack": "Next.js 16, Prisma, Postgres, pgvector, Claude API, .NET 8"
-    }
-  },
-  "/knowledgebase": {
-    "title": "knowledgebase — design notes",
-    "problem": "A personal wiki with both keyword and semantic search, where queries return the right note even if you don't remember the exact words.",
-    "architecture": [
-      "  Editor (Tiptap) ──▶ Next.js API ──▶ Postgres + pgvector",
-      "                                          ▲",
-      "                                          │",
-      "                       Embeddings ────────┘",
-      "                       (Claude API)"
-    ],
-    "decisions": [
-      "Hybrid search: tsvector full-text union'd with pgvector cosine — best of both",
-      "Embeddings on save, not on query — predictable cost",
-      "Tiptap for the editor — block-based, extensible, no Markdown ceremony"
-    ],
-    "tradeoffs": [
-      "No auth in v1 — single-user MVP",
-      "Embeddings re-run on full-edit, not diff — cheap enough at personal scale"
-    ],
-    "metrics": { "stack": "Next.js 16, Postgres, pgvector, Tiptap, Claude embeddings" }
-  },
   "/horde": {
     "title": "horde-shooter — design notes",
     "problem": "Wave-based survival shooter in vanilla Canvas 2D, no engine, 60fps with hundreds of enemies.",

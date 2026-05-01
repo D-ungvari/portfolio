@@ -64,8 +64,8 @@
     popout.setAttribute('aria-label', 'Quick settings');
 
     // Theme row
-    var themesAvail = (typeof themes !== 'undefined') ? Object.keys(themes) : ['green'];
-    var current = (typeof currentTheme !== 'undefined') ? currentTheme : 'green';
+    var themesAvail = (typeof themes !== 'undefined') ? Object.keys(themes) : ['catppuccin'];
+    var current = (typeof currentTheme !== 'undefined') ? currentTheme : 'catppuccin';
     var themeRow = '<div class="qs-section"><div class="qs-label">Theme</div><div class="qs-themes">';
     for (var i = 0; i < themesAvail.length; i++) {
       themeRow += '<button type="button" data-theme="' + themesAvail[i] + '" class="qs-theme' + (themesAvail[i] === current ? ' active' : '') + '">' + themesAvail[i] + '</button>';

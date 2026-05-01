@@ -30,14 +30,14 @@ function getTimeGreeting() {
 
 function showWelcome(terminal) {
   terminal.output('');
-  for (var i = 0; i < WELCOME_ASCII.length; i++) {
-    terminal.output(WELCOME_ASCII[i], 'ascii');
+  if (window.Neofetch && typeof Neofetch.render === 'function') {
+    Neofetch.render(terminal);
+  } else {
+    for (var i = 0; i < WELCOME_ASCII.length; i++) {
+      terminal.output(WELCOME_ASCII[i], 'ascii');
+    }
   }
   terminal.output('');
-  terminal.output(' full-stack developer. browser game builder.', 'dim');
-  if (window.Lore && typeof window.Lore.themeTagline === 'function') {
-    terminal.output(' ' + window.Lore.themeTagline(), 'dim');
-  }
   terminal.output(' ' + getTimeGreeting(), 'dim');
   terminal.output('');
   terminal.output(' type /help to see available commands.', 'dim');
@@ -51,16 +51,15 @@ function runBoot(terminal, callback) {
     : 7;
   var themeName = (typeof currentTheme !== 'undefined' && currentTheme)
     ? currentTheme
-    : 'green';
+    : 'catppuccin';
 
   var systemdLines = [
-    'Started portfolio service',
-    'Mounted /projects (' + projectCount + ' items)',
-    'Loaded theme: ' + themeName,
-    { kind: 'fail', text: 'Started user motivation' },
-    { kind: 'ok', text: 'Started user motivation (after coffee)' },
-    'Loaded easter eggs ▰▰▰▰▰▰',
-    'Reached target: desktop'
+    'Started NetworkManager.service',
+    'Mounted /home/visitor/projects (' + projectCount + ' entries)',
+    'Loaded theme unit: ' + themeName + '.target',
+    { kind: 'fail', text: 'Started user motivation.service' },
+    { kind: 'ok', text: 'Started user motivation.service (after coffee)' },
+    'Reached target Graphical Interface'
   ];
 
   // B32: Inject returning-visitor restore line before "Reached target"
@@ -223,9 +222,9 @@ function runBoot(terminal, callback) {
     splash.innerHTML =
       '<div class="grub-header">GNU GRUB  version 2.06</div>' +
       '<div class="grub-menu">' +
-        '<div class="grub-row selected">*DavOS 1.0 (default)</div>' +
-        '<div class="grub-row"> DavOS 1.0 (recovery mode)</div>' +
-        '<div class="grub-row"> Memtest86+</div>' +
+        '<div class="grub-row selected">*Arch Linux</div>' +
+        '<div class="grub-row"> Advanced options for Arch Linux</div>' +
+        '<div class="grub-row"> Memory test (memtest86+)</div>' +
       '</div>' +
       '<div class="grub-help">Use ↑/↓ keys. Default boots in <span id="grub-countdown">3</span>.</div>' +
       '<div class="splash-skip">press any key to skip</div>';
@@ -327,7 +326,7 @@ function runBoot(terminal, callback) {
  */
 function renderStage1Splash(splashEl) {
   splashEl.innerHTML =
-    '<div class="splash-title">DavOS BIOS v1.0</div>' +
+    '<div class="splash-title">Arch Linux UEFI stub</div>' +
     '<div class="splash-copyright">Copyright (c) 2026 Dave Ungvari Industries</div>' +
     '<div class="splash-spacer"></div>' +
     '<div id="splash-log"></div>' +
@@ -342,16 +341,16 @@ function renderStage1Splash(splashEl) {
 function streamPostLines(logEl) {
   var lines = [
     { delay:   50, text: 'Detecting hardware...' },
-    { delay:  140, text: '  CPU: 1x Sleep-Deprived (3.2 GHz)         <span class="ok">[ ok ]</span>' },
+    { delay:  140, text: '  CPU: Intel i7-1370P                      <span class="ok">[ ok ]</span>' },
     { delay:  220, text: '  Memory test: 0x00000000-0xFFFFFFFF       <span id="mem-bar">[░░░░░░░░]</span> <span id="mem-pct">  0%</span>',
       animate: function () { return animateMemBar(); }
     },
     { delay:  410, text: '  262144K OK' },
-    { delay:  470, text: '  Probing IDE0: caffeine.dat               <span class="ok">[ ok ]</span>' },
-    { delay:  530, text: '  Probing IDE1:                              <span class="dim">[ not found ]</span>' },
+    { delay:  470, text: '  Probing NVMe0: /dev/nvme0n1              <span class="ok">[ ok ]</span>' },
+    { delay:  530, text: '  Probing EFI variables                    <span class="ok">[ ok ]</span>' },
     { delay:  590, text: '  Probing USB: keyboard, mouse             <span class="ok">[ ok ]</span>' },
-    { delay:  650, text: '  Probing display: 1080p (vibes)           <span class="ok">[ ok ]</span>' },
-    { delay:  710, text: '  Loading kernel modules...                <span class="ok">[ ok ]</span>' }
+    { delay:  650, text: '  Probing display: tty1                    <span class="ok">[ ok ]</span>' },
+    { delay:  710, text: '  Loading initramfs-linux.img              <span class="ok">[ ok ]</span>' }
   ];
   var timers = [];
   for (var i = 0; i < lines.length; i++) {

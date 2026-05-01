@@ -5,6 +5,7 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 0 40px;
+  position: relative;
 }
 
 #terminal-bar {
@@ -98,17 +99,73 @@
 }
 
 #input-line {
-  display: flex;
-  align-items: center;
+  display: block;
   min-height: 1.6em;
   position: relative;
 }
 
-.prompt {
+.prompt,
+.prompt-echo {
   color: var(--color-primary);
   font-weight: 700;
-  white-space: nowrap;
   user-select: none;
+}
+
+.prompt-top,
+.prompt-bottom {
+  display: flex;
+  align-items: center;
+  min-height: 1.45em;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.prompt-bottom {
+  gap: 0;
+}
+
+.prompt-corner {
+  color: var(--color-dim);
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+.prompt-lambda {
+  color: var(--color-arch);
+  font-weight: 700;
+}
+
+.prompt-spacer {
+  display: inline-block;
+  width: 6px;
+}
+
+.prompt-segment {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 1px 8px;
+  border-radius: 3px;
+  color: var(--color-bg);
+  font-size: 12px;
+  line-height: 1;
+}
+
+.prompt-user {
+  background: var(--color-arch);
+  font-weight: 700;
+}
+
+.prompt-cwd {
+  background: var(--color-accent);
+}
+
+.prompt-git {
+  background: var(--color-ok);
+}
+
+.prompt-git.dirty {
+  background: var(--color-warn);
 }
 
 #input-display {
@@ -128,12 +185,32 @@
   color: var(--color-dim);
 }
 
+.terminal-mode {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  color: var(--color-dim);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  line-height: 1.2;
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+.terminal-mode.insert {
+  color: var(--color-arch);
+  border-color: var(--color-arch);
+}
+
 /* /htop interactive overlay — sprint E E13 */
 #htop-overlay {
   position: absolute;
   inset: 0;
   background: rgba(10, 10, 10, 0.96);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   color: var(--color-primary);
   z-index: 100;
@@ -193,7 +270,7 @@
 }
 #snake-overlay.snake-static {
   flex-direction: column;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--color-primary);
   text-align: center;
 }

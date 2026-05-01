@@ -24,36 +24,26 @@
   height: var(--win-h);
   transform: translate3d(var(--win-x), var(--win-y), 0);
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  /* Layered shadow ramp for compositor-style depth */
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.4),
-    0 4px 12px rgba(0, 0, 0, 0.5),
-    0 12px 32px rgba(0, 0, 0, 0.55);
+  border: var(--window-border-blur);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.56);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: box-shadow 0.18s, border-color 0.18s, opacity 0.18s, filter 0.18s;
+  transition: box-shadow 0.18s, border 0.18s, opacity 0.18s, filter 0.18s;
   opacity: 0.97;
 }
 
 .os-window.active {
-  border-color: var(--color-primary);
+  border: var(--window-border-focus);
   opacity: 1;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    0 6px 18px rgba(0, 0, 0, 0.6),
-    0 20px 56px rgba(0, 0, 0, 0.7),
-    0 0 0 1px var(--color-primary),
-    0 0 40px var(--color-glow);
+    0 12px 36px rgba(0, 0, 0, 0.64),
+    0 0 0 1px rgba(23, 147, 209, 0.28);
 }
 
 .os-window:not(.active) {
   filter: saturate(0.85) brightness(0.96);
-}
-.os-window:not(.active) .os-window-btn {
-  filter: grayscale(0.7) brightness(0.7);
 }
 
 .os-window.minimized { display: none; }
@@ -69,10 +59,10 @@
 .os-window-titlebar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 30px;
-  padding: 0 12px;
-  background: rgba(10, 10, 10, 0.94);
+  gap: 8px;
+  height: 22px;
+  padding: 0 8px;
+  background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   cursor: move;
   user-select: none;
@@ -81,28 +71,40 @@
 }
 
 .os-window.active .os-window-titlebar {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 -1px 0 rgba(23, 147, 209, 0.28);
 }
 
 .os-window-controls {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  margin-left: auto;
 }
 
 .os-window-btn {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: none;
+  border: 0;
   cursor: pointer;
-  font-size: 0;
   padding: 0;
-  transition: filter 0.12s;
+  font: inherit;
+  transition: color 0.12s, background 0.12s;
 }
-.os-window-btn.close { background: #ff5f57; }
-.os-window-btn.min { background: #febc2e; }
-.os-window-btn.max { background: #28c840; }
-.os-window-btn:hover { filter: brightness(1.2); }
+.os-window-btn.min,
+.os-window-btn.max {
+  display: none !important;
+}
+.window-close {
+  min-width: 28px;
+  height: 18px;
+  background: transparent;
+  color: var(--color-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+}
+.window-close:hover {
+  background: rgba(251, 73, 52, 0.12);
+  color: var(--color-fail);
+}
 .os-window-btn:focus-visible {
   outline: 1px solid var(--color-accent);
   outline-offset: 2px;
@@ -110,11 +112,11 @@
 
 .os-window-title {
   color: var(--color-dim);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  letter-spacing: 1px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0;
   flex: 1;
-  text-align: center;
+  text-align: left;
   pointer-events: none;
   white-space: nowrap;
   overflow: hidden;
@@ -133,7 +135,7 @@
   background: rgba(10, 10, 10, 0.84);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
 }
 .os-window-menu-item {
@@ -148,7 +150,7 @@
 }
 .os-window-menu-item:hover,
 .os-window-menu-item:focus-visible {
-  background: rgba(74, 246, 38, 0.12);
+  background: rgba(23, 147, 209, 0.12);
   color: var(--color-primary);
   outline: none;
 }
@@ -160,7 +162,7 @@
   border: 1px solid var(--color-border);
   border-radius: 4px;
   padding: 4px 0;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
   animation: anim-slide-down 140ms var(--ease-out-emphasized);
@@ -178,7 +180,7 @@
   font: inherit;
   text-align: left;
 }
-.os-window-menu-row:hover { background: rgba(74, 246, 38, 0.12); }
+.os-window-menu-row:hover { background: rgba(23, 147, 209, 0.12); }
 .os-window-menu-row.disabled {
   color: var(--color-dim);
   cursor: not-allowed;
@@ -203,7 +205,7 @@
   background: rgba(10, 10, 10, 0.84);
   border-top: 1px solid var(--color-border);
   color: var(--color-dim);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 11px;
   flex-shrink: 0;
   user-select: none;
@@ -232,7 +234,7 @@
   height: 100%;
   overflow: auto;
   color: var(--color-primary);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 
 .os-window-loading {
@@ -242,7 +244,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-dim);
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   pointer-events: none;
   transition: opacity 0.25s;
@@ -263,24 +265,24 @@
 /* Hover affordance — E07: theme-color highlight on the 8 resize zones */
 .os-window-resize.n:hover,
 .os-window-resize.s:hover {
-  background: linear-gradient(to bottom, transparent, rgba(74, 246, 38, 0.20), transparent);
+  background: linear-gradient(to bottom, transparent, rgba(23, 147, 209, 0.20), transparent);
 }
 .os-window-resize.e:hover,
 .os-window-resize.w:hover {
-  background: linear-gradient(to right, transparent, rgba(74, 246, 38, 0.20), transparent);
+  background: linear-gradient(to right, transparent, rgba(23, 147, 209, 0.20), transparent);
 }
 .os-window-resize.ne:hover,
 .os-window-resize.nw:hover,
 .os-window-resize.se:hover,
 .os-window-resize.sw:hover {
-  background: radial-gradient(circle at center, rgba(74, 246, 38, 0.30), transparent 70%);
+  background: radial-gradient(circle at center, rgba(23, 147, 209, 0.30), transparent 70%);
 }
 
 /* Active resize — keep the highlight visible during the drag */
 .os-window.resizing .os-window-resize.n:hover,
-.os-window.resizing .os-window-resize.s:hover { background: linear-gradient(to bottom, transparent, rgba(74, 246, 38, 0.40), transparent); }
+.os-window.resizing .os-window-resize.s:hover { background: linear-gradient(to bottom, transparent, rgba(23, 147, 209, 0.40), transparent); }
 .os-window.resizing .os-window-resize.e:hover,
-.os-window.resizing .os-window-resize.w:hover { background: linear-gradient(to right, transparent, rgba(74, 246, 38, 0.40), transparent); }
+.os-window.resizing .os-window-resize.w:hover { background: linear-gradient(to right, transparent, rgba(23, 147, 209, 0.40), transparent); }
 
 .os-window.dragging,
 .os-window.resizing {
@@ -299,8 +301,8 @@
   left: 0;
   width: 0;
   height: 0;
-  background: rgba(74, 246, 38, 0.12);
-  border: 2px solid var(--color-primary);
+  background: rgba(23, 147, 209, 0.12);
+  border: 2px solid var(--color-arch);
   pointer-events: none;
   z-index: 4500;
   transition: all 0.12s ease-out;
@@ -325,17 +327,12 @@
 
 /* Taskbar running-apps strip (B07) ----------------------------------------- */
 #taskbar-running {
-  display: flex;
-  gap: 4px;
-  margin-left: 16px;
-  flex: 1;
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
+  display: none;
 }
 #taskbar-running::-webkit-scrollbar { display: none; }
 
 .taskbar-app {
+  display: none;
   background: transparent;
   border: 1px solid var(--color-border);
   color: var(--color-dim);
@@ -357,7 +354,7 @@
 .taskbar-app.active {
   color: var(--color-primary);
   border-color: var(--color-primary);
-  background: rgba(74, 246, 38, 0.08);
+  background: rgba(23, 147, 209, 0.08);
 }
 .taskbar-app.minimized {
   color: var(--color-dim);

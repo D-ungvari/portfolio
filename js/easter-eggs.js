@@ -55,7 +55,88 @@ registerCommand('/cat', '', function(terminal) {
 }, true);
 
 registerCommand('/vim', '', function(terminal) {
-  terminal.output('good luck exiting.', 'dim');
+  terminal.output('Vim 9.1 - no buffer. good luck exiting; type :q to quit.', 'dim');
+}, true);
+
+registerCommand('/nvim', '', function(terminal) {
+  terminal.output('NVIM v0.10 - empty buffer opened. :q closes absolutely nothing.', 'dim');
+}, true);
+
+registerCommand(':q', '', function(terminal) {
+  terminal.output('closed scratch buffer. terminal still here.', 'dim');
+}, true);
+
+registerCommand(':q!', '', function(terminal) {
+  terminal.output('force quit ignored: no swap file, no buffer, no mercy.', 'dim');
+}, true);
+
+registerCommand(':wq', '', function(terminal) {
+  terminal.output('E32: no file name. nothing written.', 'dim');
+}, true);
+
+registerCommand('btw', '', function(terminal) {
+  terminal.outputHTML('<span style="color:var(--color-arch)">i use arch btw.</span>');
+}, true);
+
+function renderPackageTranscript(terminal, manager) {
+  var name = manager || 'pacman';
+  var lines;
+  if (name === 'pacman') {
+    lines = [
+      ':: Synchronizing package databases...',
+      ' core                  128.4 KiB   512 KiB/s 00:00 [################] 100%',
+      ' extra                   8.2 MiB  6.66 MiB/s 00:01 [################] 100%',
+      ' multilib              139.2 KiB   420 KiB/s 00:00 [################] 100%',
+      ':: Starting full system upgrade...',
+      'resolving dependencies...',
+      'looking for conflicting packages...',
+      'Packages (4) linux-6.8.9.arch1-1  zsh-5.9-5  neovim-0.10.0-2  fastfetch-2.9.1-1',
+      'Total Download Size: 42.0 MiB',
+      ':: Proceed with installation? [Y/n] y',
+      '(4/4) checking keys in keyring                     [################] 100%',
+      ':: Transaction complete.'
+    ];
+  } else {
+    lines = [
+      ':: Searching AUR for explicit upgrades...',
+      ' -> ' + name + ' found 2 foreign packages',
+      ':: (1/2) Parsing SRCINFO: portfolio-terminal-git',
+      ':: (2/2) Parsing SRCINFO: dotfiles-btw-git',
+      '==> Making package: portfolio-terminal-git 2026.05.01-1',
+      '==> Checking runtime dependencies...',
+      '==> Installing package portfolio-terminal-git...',
+      ' -> done. no reboot required, but reload your shell btw.'
+    ];
+  }
+  terminal.outputLines(lines, 'dim');
+  terminal.output('');
+}
+
+registerCommand('/pacman', '', function(terminal) {
+  terminal.output('usage: /pacman -Syu', 'dim');
+}, true);
+
+registerCommand('/pacman -syu', '', function(terminal) {
+  renderPackageTranscript(terminal, 'pacman');
+}, true);
+
+registerCommand('/yay', '', function(terminal) {
+  renderPackageTranscript(terminal, 'yay');
+}, true);
+
+registerCommand('/paru', '', function(terminal) {
+  renderPackageTranscript(terminal, 'paru');
+}, true);
+
+registerCommand('/aur', '', function(terminal) {
+  terminal.output("you don't need yay btw, paru is faster.", 'dim');
+}, true);
+
+registerCommand('/dotfiles', 'open dotfiles', function(terminal) {
+  var url = 'https://github.com/D-ungvari/dotfiles';
+  var ua = (window.navigator && window.navigator.userAgent) || '';
+  try { if (window.open && ua.indexOf('jsdom') === -1) window.open(url, '_blank', 'noopener'); } catch (e) {}
+  terminal.outputHTML('dotfiles  <a href="' + url + '" target="_blank" rel="noopener">github.com/D-ungvari/dotfiles</a>');
 }, true);
 
 registerCommand('/emacs', '', function(terminal) {
@@ -64,23 +145,6 @@ registerCommand('/emacs', '', function(terminal) {
 
 registerCommand('42', '', function(terminal) {
   terminal.output('the answer to life, the universe, and everything.', 'dim');
-}, true);
-
-// /neofetch — system info in ASCII art style
-registerCommand('/neofetch', '', function(terminal) {
-  var lines = [
-    '        .--.          david@ungvari',
-    '       |o_o |         ──────────────────',
-    '       |:_/ |         OS: Portfolio Terminal v1.0',
-    '      //   \\ \\        Shell: /commands',
-    '     (|     | )       Theme: ' + (typeof currentTheme !== 'undefined' ? currentTheme : 'green'),
-    '    /\'\\_   _/`\\       Projects: ' + projects.length,
-    '    \\___)=(___/       Uptime: since page load',
-    '                      Font: JetBrains Mono',
-    '                      Resolution: ' + (typeof window !== 'undefined' ? window.innerWidth + 'x' + window.innerHeight : 'unknown')
-  ];
-  terminal.outputLines(lines, 'dim');
-  terminal.output('');
 }, true);
 
 // /cowsay — wraps last command or message in a cow speech bubble

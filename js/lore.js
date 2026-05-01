@@ -36,8 +36,6 @@
         { version: "v1.4.0", date: "2026-04", type: "feat",     msg: "ship DavOS v3 portfolio (windows + apps + persona)" },
         { version: "v1.3.4", date: "2026-03", type: "feat",     msg: "ship DavOS v2 portfolio (OS desktop + terminal pane)" },
         { version: "v1.3.3", date: "2026-02", type: "feat",     msg: "swarm-command RTS — 13 units, fog of war, adaptive AI" },
-        { version: "v1.3.2", date: "2026-01", type: "feat",     msg: "knowledgebase — RAG + hybrid search wiki" },
-        { version: "v1.3.1", date: "2025-11", type: "feat",     msg: "jobtracker — Claude API + pgvector + .NET extraction" },
         { version: "v1.3.0", date: "2025-08", type: "refactor", msg: "platform-shooter + horde-shooter — vanilla canvas games" },
         { version: "v1.2.0", date: "2024-09", type: "feat",     msg: "uxcrimes — 20 levels of dark UX patterns" },
         { version: "v1.1.0", date: "2023-08", type: "feat",     msg: "joined Omada A/S — full-stack on identity governance" },
@@ -63,7 +61,7 @@
         synopsis: "portfolio [--theme=NAME] [--mode=desktop|terminal|boring]",
         description: "An OS-style developer portfolio. Click icons or type commands. 7 projects, 4 themes, 50+ commands, easter eggs, recruiter mode. Zero dependencies, vanilla HTML/CSS/JS, ~7000 LOC.",
         options: [
-          "--theme=NAME      green (default), amber, blue, matrix",
+          "--theme=NAME      catppuccin (default), gruvbox, tokyonight, nord",
           "--mode=MODE       desktop (default), terminal-only, boring (static CV)"
         ],
         see_also: "dave(1), /help, /grid, /boring"
@@ -91,20 +89,6 @@
         description: "20 levels of escape rooms built around manipulative UI: cookie banners, deceptive checkboxes, hostile unsubscribes. Vanilla JS.",
         options: ["(no flags — just escape)"],
         see_also: "/docs uxcrimes"
-      },
-      "jobtracker": {
-        name: "jobtracker — AI-powered job application tracker",
-        synopsis: "jobtracker",
-        description: "Full-stack Kanban board for job hunts. Claude API for resume parsing, pgvector for semantic search, .NET 8 extraction pipeline, dockerized, CI/CD.",
-        options: ["(see live demo)"],
-        see_also: "/docs jobtracker"
-      },
-      "knowledgebase": {
-        name: "knowledgebase — personal wiki with hybrid RAG",
-        synopsis: "knowledgebase",
-        description: "Notes app with full-text + semantic search via pgvector embeddings. RAG pipeline for natural-language queries over your own notes.",
-        options: ["(see live demo)"],
-        see_also: "/docs knowledgebase"
       },
       "platformer": {
         name: "platformer — arcade platform shooter",
@@ -141,11 +125,11 @@
         { keywords: ["salary", "comp", "compensation", "pay", "dkk"],
           answer: "Comp range 750-950k DKK base, depends on role + level + remote split. Type /availability for the source." },
         { keywords: ["dotnet", ".net", "c#", "csharp"],
-          answer: "C#/.NET in production daily for 3+ years at Omada A/S. Built REST + GraphQL services, SQL Server data layer, .NET 8 extraction pipeline for the JobTracker side project." },
+          answer: "C#/.NET in production daily for 3+ years at Omada A/S. Built REST + GraphQL services, SQL Server data layer." },
         { keywords: ["react", "typescript", "frontend"],
           answer: "React + TypeScript is the daily driver. Built the entire frontend at Omada (identity governance UI, complex tables, GraphQL hooks). Side projects use Next.js + Tailwind." },
         { keywords: ["ai", "claude", "rag", "pgvector", "llm"],
-          answer: "Built two RAG systems: JobTracker (Claude API for resume parsing) + KnowledgeBase (hybrid full-text + semantic search via pgvector). Comfortable with prompt caching, tool use, embeddings, retrieval pipelines." },
+          answer: "Comfortable with Claude API, prompt caching, tool use, embeddings, and retrieval pipelines." },
         { keywords: ["games", "canvas", "rts", "pixi"],
           answer: "Three browser games (vanilla Canvas 2D) and one TypeScript RTS (Swarm Command, PixiJS v8). The RTS has a hand-rolled ECS with TypedArrays, fog of war, spatial hash queries, adaptive AI. 180 tests." },
         { keywords: ["language", "danish", "hungarian", "english"],
@@ -166,32 +150,32 @@
         { type: "wait", ms: 2500 },
         { type: "say", text: "→ TypeScript + PixiJS RTS. 180 tests. Hand-rolled ECS." },
         { type: "wait", ms: 1500 },
-        { type: "run", cmd: "/jobtracker" },
+        { type: "run", cmd: "/horde" },
         { type: "wait", ms: 2500 },
-        { type: "say", text: "→ Full-stack AI: Claude API, pgvector, .NET extraction." },
+        { type: "say", text: "→ Wave-based survival shooter. Vanilla Canvas 2D, no engine." },
         { type: "wait", ms: 1500 },
-        { type: "run", cmd: "/knowledgebase" },
+        { type: "run", cmd: "/uxcrimes" },
         { type: "wait", ms: 2500 },
-        { type: "say", text: "→ Hybrid RAG search, Next.js + Postgres." },
+        { type: "say", text: "→ 20 levels of dark UX patterns. Vanilla JS." },
         { type: "wait", ms: 1500 },
         { type: "say", text: "→ Tour complete. Type /contact to start a conversation." }
       ],
       demo: [
         { type: "say", text: "[ DEMO MODE — input locked. press any key to exit. ]" },
         { type: "wait", ms: 500 },
-        { type: "theme", name: "amber" },
+        { type: "theme", name: "gruvbox" },
         { type: "wait", ms: 1000 },
         { type: "run", cmd: "/about" },
         { type: "wait", ms: 2500 },
-        { type: "theme", name: "blue" },
+        { type: "theme", name: "tokyonight" },
         { type: "wait", ms: 600 },
         { type: "run", cmd: "/skills" },
         { type: "wait", ms: 2500 },
-        { type: "theme", name: "matrix" },
+        { type: "theme", name: "nord" },
         { type: "wait", ms: 600 },
         { type: "run", cmd: "/projects" },
         { type: "wait", ms: 2500 },
-        { type: "theme", name: "green" },
+        { type: "theme", name: "catppuccin" },
         { type: "wait", ms: 800 },
         { type: "run", cmd: "/contact" },
         { type: "wait", ms: 1500 },
@@ -224,49 +208,6 @@
           "Fixed timestep adds input lag risk — mitigated by frame-rate input"
         ],
         metrics: { loc: "~3500", tests: 180, fps: "60 stable, 100+ units", stack: "TypeScript, PixiJS v8, Vite, Vitest" }
-      },
-      "/jobtracker": {
-        title: "jobtracker — design notes",
-        problem: "Track applications + extract structured data from job postings using LLMs without burning tokens or leaking PII.",
-        architecture: [
-          "  Browser ──▶ Next.js API ──▶ Prisma ──▶ Postgres + pgvector",
-          "                  │                          ▲",
-          "                  ▼                          │",
-          "             Claude API ──▶ .NET extractor ──┘",
-          "             (cached)        (background queue)"
-        ],
-        decisions: [
-          "Prompt caching on Claude — 80% cost reduction on repeated parses",
-          "pgvector + cosine similarity for semantic match",
-          ".NET 8 minimal API for the extraction queue — heavier work off Node",
-          "Dockerized end-to-end + GitHub Actions CI"
-        ],
-        tradeoffs: [
-          "Adds .NET runtime to the stack — justified by extraction throughput",
-          "Cache invalidation on prompt changes is manual — acceptable at this scale"
-        ],
-        metrics: { loc: "~6000", stack: "Next.js 16, Prisma, Postgres, pgvector, Claude API, .NET 8" }
-      },
-      "/knowledgebase": {
-        title: "knowledgebase — design notes",
-        problem: "A personal wiki with both keyword and semantic search, where queries return the right note even if you don't remember the exact words.",
-        architecture: [
-          "  Editor (Tiptap) ──▶ Next.js API ──▶ Postgres + pgvector",
-          "                                          ▲",
-          "                                          │",
-          "                       Embeddings ────────┘",
-          "                       (Claude API)"
-        ],
-        decisions: [
-          "Hybrid search: tsvector full-text union'd with pgvector cosine — best of both",
-          "Embeddings on save, not on query — predictable cost",
-          "Tiptap for the editor — block-based, extensible, no Markdown ceremony"
-        ],
-        tradeoffs: [
-          "No auth in v1 — single-user MVP",
-          "Embeddings re-run on full-edit, not diff — cheap enough at personal scale"
-        ],
-        metrics: { stack: "Next.js 16, Postgres, pgvector, Tiptap, Claude embeddings" }
       },
       "/horde": {
         title: "horde-shooter — design notes",
@@ -708,7 +649,7 @@
     loadOrFallback('data/tour.json', 'tour').then(function (data) {
       var inp = document.getElementById('command-input');
       if (inp) inp.disabled = true;
-      var savedTheme = (typeof currentTheme !== 'undefined') ? currentTheme : 'green';
+        var savedTheme = (typeof currentTheme !== 'undefined') ? currentTheme : 'catppuccin';
       var abort = runTour(terminal, (data && data.demo) || [], function (wasAborted) {
         if (inp) inp.disabled = false;
         if (typeof applyTheme === 'function' && savedTheme) applyTheme(savedTheme);
@@ -753,14 +694,14 @@
   }
 
   function themeTagline() {
-    var t = (typeof currentTheme !== 'undefined' && currentTheme) ? currentTheme : 'green';
+    var t = (typeof currentTheme !== 'undefined' && currentTheme) ? currentTheme : 'catppuccin';
     var taglines = {
-      green: 'ship it.',
-      amber: 'warning: vibes incoming.',
-      blue: 'enterprise mode engaged.',
-      matrix: 'wake up, neo.'
+      catppuccin: 'mocha profile loaded.',
+      gruvbox: 'warm compile cache.',
+      tokyonight: 'night shift engaged.',
+      nord: 'frosted shell ready.'
     };
-    return taglines[t] || taglines.green;
+    return taglines[t] || taglines.catppuccin;
   }
 
   window.Lore = {

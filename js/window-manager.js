@@ -13,12 +13,14 @@
  *   WindowManager.get(id) -> WindowState
  *   WindowManager.byApp(app) -> [WindowState]
  *   WindowManager.activeId() -> id | null
+ *   WindowManager.activeTitle() -> string
+ *   WindowManager.onActiveChange(cb) -> unsubscribe
  *   WindowManager.snapActive(direction)
  *   WindowManager.restoreSession()
  *
  * State shape:
  *   { id, app, project, title, url, content, x, y, w, h, z,
- *     minimized, maximized, prevRect }
+ *     minimized, maximized, prevRect, workspaceId, floating }
  *
  * Persistence: writes `windows` to Session on every state change. iframe
  * windows (those with `url`) are NOT restored at boot — only native-app
@@ -40,6 +42,7 @@
   var idCounter = 0;
   var zCounter = 1000;
   var activeId = null;
+  var activeObservers = [];
   var layerEl = null;
   var snapPreviewEl = null;
   var taskbarRunningEl = null;
@@ -93,6 +96,14 @@
     return { w: DEFAULT_W_DESKTOP, h: DEFAULT_H_DESKTOP };
   }
 
+  function currentWorkspaceId() {
+    if (window.Workspaces) {
+      if (typeof window.Workspaces.currentId === 'function') return window.Workspaces.currentId();
+      if (window.Workspaces.current != null) return window.Workspaces.current;
+    }
+    return 1;
+  }
+
   function ensureLayer() {
     if (layerEl) return layerEl;
     layerEl = document.getElementById('window-layer');
@@ -134,6 +145,29 @@
         else taskbarBtns[b].classList.remove('active');
       }
     }
+    notifyActiveChange();
+  }
+
+  function activeTitle() {
+    var state = activeId ? windows[activeId] : null;
+    return state && !state.minimized ? (state.title || '') : '';
+  }
+
+  function notifyActiveChange() {
+    var title = activeTitle();
+    for (var i = 0; i < activeObservers.length; i++) {
+      try { activeObservers[i](title, activeId); } catch (e) {}
+    }
+  }
+
+  function onActiveChange(cb) {
+    if (typeof cb !== 'function') return function () {};
+    activeObservers.push(cb);
+    try { cb(activeTitle(), activeId); } catch (e) {}
+    return function () {
+      var idx = activeObservers.indexOf(cb);
+      if (idx !== -1) activeObservers.splice(idx, 1);
+    };
   }
 
   function persist() {
@@ -153,7 +187,9 @@
         z: s.z,
         minimized: !!s.minimized,
         maximized: !!s.maximized,
-        prevRect: s.prevRect || null
+        prevRect: s.prevRect || null,
+        workspaceId: s.workspaceId || 1,
+        floating: !!s.floating
       });
     }
     try { window.Session.patch({ windows: serialized }); } catch (e) {}
@@ -165,6 +201,7 @@
     var root = document.createElement('div');
     root.className = 'os-window';
     root.setAttribute('data-window-id', state.id);
+    root.setAttribute('data-workspace-id', String(state.workspaceId || 1));
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-label', state.title || 'Window');
 
@@ -176,37 +213,19 @@
     controls.className = 'os-window-controls';
 
     var closeBtn = document.createElement('button');
-    closeBtn.className = 'os-window-btn close';
+    closeBtn.className = 'window-close os-window-btn close';
     closeBtn.setAttribute('aria-label', 'Close');
-    closeBtn.textContent = '●';
+    closeBtn.textContent = '[X]';
     closeBtn.addEventListener('click', function (e) { e.stopPropagation(); api.close(state.id); });
 
-    var minBtn = document.createElement('button');
-    minBtn.className = 'os-window-btn min';
-    minBtn.setAttribute('aria-label', 'Minimize');
-    minBtn.textContent = '●';
-    minBtn.addEventListener('click', function (e) { e.stopPropagation(); api.minimize(state.id); });
-
-    var maxBtn = document.createElement('button');
-    maxBtn.className = 'os-window-btn max';
-    maxBtn.setAttribute('aria-label', 'Maximize');
-    maxBtn.textContent = '●';
-    maxBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (state.maximized) api.unmaximize(state.id);
-      else api.maximize(state.id);
-    });
-
     controls.appendChild(closeBtn);
-    controls.appendChild(minBtn);
-    controls.appendChild(maxBtn);
 
     var titleEl = document.createElement('span');
     titleEl.className = 'os-window-title';
     titleEl.textContent = state.title || '';
 
-    bar.appendChild(controls);
     bar.appendChild(titleEl);
+    bar.appendChild(controls);
 
     // Menubar (native apps only — iframe windows skip)
     var menubar = null;
@@ -629,7 +648,9 @@
       z: ++zCounter,
       minimized: false,
       maximized: false,
-      prevRect: null
+      prevRect: null,
+      workspaceId: opts.workspaceId != null ? opts.workspaceId : currentWorkspaceId(),
+      floating: !!opts.floating
     };
 
     var root = buildDom(state, opts);
@@ -642,6 +663,9 @@
 
     addTaskbarButton(state);
     setActive(id);
+    if (window.Workspaces && typeof window.Workspaces.addWindow === 'function') {
+      window.Workspaces.addWindow(id, state.workspaceId);
+    }
 
     // Open animation — origin from click coords if provided
     if (window.Anim && typeof window.Anim.scaleIn === 'function') {
@@ -667,6 +691,9 @@
 
     var doRemove = function () {
       if (el && el.parentNode) el.parentNode.removeChild(el);
+      if (window.Workspaces && typeof window.Workspaces.removeWindow === 'function') {
+        window.Workspaces.removeWindow(id);
+      }
       delete elements[id];
       delete windows[id];
       delete iframeRefs[id];
@@ -684,6 +711,7 @@
           }
         }
         if (top) setActive(top);
+        else notifyActiveChange();
       }
       emit('window:close', { id: id });
       persist();
@@ -713,16 +741,14 @@
         activeId = null;
         el.classList.remove('active');
         if (taskbarBtns[id]) taskbarBtns[id].classList.remove('active');
+        notifyActiveChange();
       }
       emit('window:minimize', { id: id });
       persist();
     };
 
-    var btn = taskbarBtns[id];
-    if (btn && window.Anim && typeof window.Anim.genie === 'function' && !window.Anim.reduced()) {
-      var br = btn.getBoundingClientRect();
-      var target = { x: br.left, y: br.top, w: br.width, h: br.height };
-      window.Anim.genie(el, target, { dur: 280 }).then(finish);
+    if (window.Anim && typeof window.Anim.slideOut === 'function' && !window.Anim.reduced()) {
+      window.Anim.slideOut(el, 'down', { dur: 140, distance: 16 }).then(finish);
     } else {
       finish();
     }
@@ -736,10 +762,8 @@
     el.classList.remove('minimized');
     if (taskbarBtns[id]) taskbarBtns[id].classList.remove('minimized');
 
-    var btn = taskbarBtns[id];
-    if (btn && window.Anim && typeof window.Anim.ungenie === 'function') {
-      var br = btn.getBoundingClientRect();
-      window.Anim.ungenie(el, { x: br.left, y: br.top, w: br.width, h: br.height }, { dur: 260 });
+    if (window.Anim && typeof window.Anim.fadeIn === 'function') {
+      window.Anim.fadeIn(el, { dur: 140 });
     }
 
     bringToFront(id);
@@ -811,6 +835,69 @@
 
   function get(id) {
     return windows[id] || null;
+  }
+
+  function move(id, x, y, w, h) {
+    var state = windows[id];
+    var el = elements[id];
+    if (!state || !el) return false;
+    state.x = Math.round(x);
+    state.y = Math.round(y);
+    state.w = Math.round(w);
+    state.h = Math.round(h);
+    state.maximized = false;
+    state.prevRect = null;
+    el.classList.remove('maximized');
+    applyGeometry(el, state);
+    emit('window:geometry', { id: id });
+    persist();
+    return true;
+  }
+
+  function setWorkspace(id, workspaceId) {
+    var state = windows[id];
+    var el = elements[id];
+    if (!state || !el) return false;
+    var n = parseInt(workspaceId, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    state.workspaceId = n;
+    el.setAttribute('data-workspace-id', String(n));
+    persist();
+    return true;
+  }
+
+  function clearActive() {
+    activeId = null;
+    for (var k in elements) {
+      if (Object.prototype.hasOwnProperty.call(elements, k)) elements[k].classList.remove('active');
+    }
+    for (var b in taskbarBtns) {
+      if (Object.prototype.hasOwnProperty.call(taskbarBtns, b)) taskbarBtns[b].classList.remove('active');
+    }
+    notifyActiveChange();
+  }
+
+  function showWorkspace(workspaceId) {
+    var n = parseInt(workspaceId, 10);
+    if (!isFinite(n) || n < 1) n = 1;
+    var nextActive = null;
+    var topZ = -1;
+    for (var i = 0; i < order.length; i++) {
+      var id = order[i];
+      var s = windows[id];
+      var el = elements[id];
+      if (!s || !el) continue;
+      var visible = (s.workspaceId || 1) === n;
+      el.classList.toggle('workspace-hidden', !visible);
+      if (visible && !s.minimized && s.z > topZ) {
+        topZ = s.z;
+        nextActive = id;
+      }
+    }
+    if (!activeId || !windows[activeId] || (windows[activeId].workspaceId || 1) !== n || windows[activeId].minimized) {
+      if (nextActive) setActive(nextActive);
+      else clearActive();
+    }
   }
 
   function byApp(appName) {
@@ -953,7 +1040,9 @@
           app: s.app,
           project: s.project,
           title: s.title,
-          x: s.x, y: s.y, w: s.w, h: s.h
+          x: s.x, y: s.y, w: s.w, h: s.h,
+          workspaceId: s.workspaceId || 1,
+          floating: !!s.floating
         });
         if (s.minimized) minimize(id);
         if (s.maximized) maximize(id);
@@ -1043,6 +1132,7 @@
     if (t) t.textContent = text;
     var btn = taskbarBtns[id];
     if (btn) btn.textContent = text;
+    if (activeId === id) notifyActiveChange();
     persist();
   }
 
@@ -1056,8 +1146,13 @@
     bringToFront: bringToFront,
     list: list,
     get: get,
+    move: move,
+    setWorkspace: setWorkspace,
+    showWorkspace: showWorkspace,
     byApp: byApp,
     activeId: function () { return activeId; },
+    activeTitle: activeTitle,
+    onActiveChange: onActiveChange,
     snapActive: snapActive,
     restoreSession: restoreSession,
     setStatus: setStatus,

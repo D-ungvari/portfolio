@@ -1,15 +1,26 @@
 # Progress — Portfolio Terminal / DavOS
 
-> Last updated: 2026-04-30
-> Last session: Ran `/ultraplan improvements and eastereggs` then `/dev auto all` through E01–E16.
+> Last updated: 2026-05-01
+> Last session: Ran `/dev A7` for arch-linux-redesign cultural commands and hash-route paths.
 
 ## Current Work Item
-None — Sprint E shipped. All 16 tasks E01–E16 complete.
+None — Phase 3 Arch Linux redesign shipped. All 7 tasks A1–A7 complete, 700 tests passing.
 
 ## Phase: IDLE
 
 ### Test status
-`npm test` → **655 passing, 0 failing** (was 615 baseline before sprint).
+`node tests/run-tests.js` -> **700 passing, 0 failing** after A7.
+
+### Phase 3 — Arch Linux redesign (shipped)
+| # | Task | Notes |
+|---|------|-------|
+| A1 | Palette + font + brand foundation | Complete. Default theme is Catppuccin; available themes are Catppuccin, Gruvbox, Tokyo Night, Nord. Added `--color-arch` `#1793D1`, status tokens, `--font-mono`, and legacy theme migration. |
+| A2 | Polybar-style status bar | Complete. Bar now has workspace placeholder left, active window title center, and system-stat pills right. Removed bar theme dropdown and About panel. |
+| A3 | i3-minimal window chrome | Complete. Window titlebars now use one `[X]` close button, Arch-cyan focus borders, and slide-fade minimize/restore. |
+| A4 | Workspace switcher + opt-in tiling | Complete. Five workspace pills, `Meta+1..5`/`Ctrl+Alt+1..5`, `Meta+T` tiling, `workspaces` session state, and pinned-apps dock removal. |
+| A5 | Neofetch `/about` + Arch ASCII | Complete. `/about`, `/neofetch`, `/fastfetch`, `/banner`, and boot welcome now render the Arch neofetch profile. |
+| A6 | Powerline prompt + vim mode | Complete. Terminal input now uses a two-line powerline prompt, live cwd/git segments, focus-driven mode indicator, and vim/nvim gag commands. |
+| A7 | Pacman + btw + dotfiles + path URLs | Complete. Added pacman/AUR transcripts, `btw`, `/dotfiles`, Arch-flavored boot text, hash-route command bridge, and path-style URLs. |
 
 ### Sprint E — completed (this session)
 | # | Task | Notes |
@@ -37,4 +48,4 @@ None — Sprint E shipped. All 16 tasks E01–E16 complete.
 | Initial build through v4 | 2026-03 / 2026-04 | bc89e87, c0e1c65, 53f5cea, 1054070, ca9873f, d6fb938, 4126f1c, 22c14e1 |
 
 ## Next session
-Pick up next BACKLOG item if any, or take Sprint E to commit / PR.
+Phase 4 (content + recruiter polish) — ASCII art project tiles, `/experience` + `/resume` polish, real dotfiles repo, README screenshot, Lighthouse a11y, GitHub Pages deploy.

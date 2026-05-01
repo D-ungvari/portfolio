@@ -89,40 +89,6 @@ var projects = [
     liveUrl: 'https://d-ungvari.github.io/portfolio/',
     sourceUrl: 'https://github.com/D-ungvari/portfolio'
   },
-  {
-    command: '/jobtracker',
-    title: 'JOBTRACKER',
-    tagline: 'AI-powered job application tracker with Kanban board',
-    category: 'app',
-    glyph: '▤',
-    description: [
-      'A full-stack job application tracker with a',
-      'drag-and-drop Kanban board. AI-powered resume',
-      'parsing via Claude, semantic search with',
-      'pgvector, and .NET extraction pipeline.',
-      'Dockerized with CI/CD via GitHub Actions.'
-    ],
-    stack: 'next.js / .net 8 / postgresql / pgvector / claude api',
-    liveUrl: 'https://d-ungvari.github.io/JobTracker/',
-    sourceUrl: 'https://github.com/D-ungvari/JobTracker'
-  },
-  {
-    command: '/knowledgebase',
-    title: 'KNOWLEDGEBASE',
-    tagline: 'A personal wiki with RAG-powered semantic search',
-    category: 'app',
-    glyph: '⌬',
-    description: [
-      'A personal knowledge management wiki with',
-      'hybrid search — full-text and semantic via',
-      'pgvector embeddings. RAG pipeline for natural',
-      'language queries over your own notes.',
-      'Built with Next.js and PostgreSQL.'
-    ],
-    stack: 'next.js / postgresql / pgvector / rag',
-    liveUrl: 'https://d-ungvari.github.io/knowledgebase/',
-    sourceUrl: 'https://github.com/D-ungvari/knowledgebase'
-  }
 ];
 
 // Helper to filter projects by category

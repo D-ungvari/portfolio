@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', function() {
           }
         }
       }
+      if (window.HashRouter && typeof window.HashRouter.navigateForCommand === 'function') {
+        window.HashRouter.navigateForCommand(trimmed);
+      }
     };
 
     // Wire mobile command chips
@@ -107,6 +110,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Run boot sequence
     runBoot(term, function() {
       term.activateInput();
+      if (window.HashRouter && typeof window.HashRouter.bind === 'function') {
+        window.HashRouter.bind(term, { runInitial: true });
+      }
     });
   }
 

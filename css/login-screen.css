@@ -25,7 +25,7 @@
 #login-screen .login-content {
   position: relative;
   text-align: center;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   color: var(--color-primary);
   display: flex;
   flex-direction: column;

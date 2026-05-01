@@ -13,9 +13,10 @@
 .desktop-icon,
 .taskbar-app,
 .context-menu-item,
-.taskbar-menu-item,
 #trash-icon,
-#taskbar-os-label,
+#taskbar-launcher,
+.workspace-pill,
+.bar-icon-btn,
 #taskbar-clock,
 .tray-item { cursor: pointer; }
 

@@ -15,12 +15,25 @@ function Terminal(container) {
   this.isActive = false;
   this.onCommand = null;
   this.maxInputLength = 200;
+  this.gitStatus = Terminal._newGitStatus();
 
   // Set maxlength on the input element
   this.inputEl.setAttribute('maxlength', this.maxInputLength);
 
+  this._ensurePromptMarkup();
+  this.inputEl.setAttribute('maxlength', this.maxInputLength);
+  this._ensureModeIndicator();
+  this._updatePrompt();
+  this._setMode('normal');
   this._bindEvents();
 }
+
+Terminal._newGitStatus = function() {
+  return {
+    modified: Math.floor(Math.random() * 3),
+    untracked: Math.floor(Math.random() * 2)
+  };
+};
 
 Terminal.prototype._bindEvents = function() {
   var self = this;
@@ -40,6 +53,14 @@ Terminal.prototype._bindEvents = function() {
     self._typingTimeout = setTimeout(function() {
       self.cursor.classList.remove('typing');
     }, 150);
+  });
+
+  this.inputEl.addEventListener('focus', function() {
+    self._setMode('insert');
+  });
+
+  this.inputEl.addEventListener('blur', function() {
+    self._setMode('normal');
   });
 
   // Handle keydown for Enter, Up, Down
@@ -75,8 +96,7 @@ Terminal.prototype._processCommand = function() {
 
   // Echo the command to output
   this.outputHTML(
-    '<span class="prompt">visitor@dave:~$&nbsp;</span><span style="color:#ffffff">' +
-    this._escapeHTML(raw) + '</span>'
+    this._promptEchoHTML(this._escapeHTML(raw))
   );
 
   // Add to history if non-empty
@@ -94,6 +114,7 @@ Terminal.prototype._processCommand = function() {
   if (this.onCommand) {
     this.onCommand(raw);
   }
+  this._updatePrompt();
 
   this._scrollToBottom();
 };
@@ -169,17 +190,21 @@ Terminal.prototype.outputLines = function(lines, className) {
 
 Terminal.prototype.clear = function() {
   this.outputEl.innerHTML = '';
+  this.gitStatus = Terminal._newGitStatus();
+  this._updatePrompt();
 };
 
 Terminal.prototype.activateInput = function() {
   this.isActive = true;
-  this.inputLine.style.display = 'flex';
+  this.inputLine.style.display = 'block';
   this.inputEl.focus();
+  this._setMode('insert');
 };
 
 Terminal.prototype.deactivateInput = function() {
   this.isActive = false;
   this.inputLine.style.display = 'none';
+  this._setMode('normal');
 };
 
 Terminal.prototype._scrollToBottom = function() {
@@ -193,4 +218,86 @@ Terminal.prototype._escapeHTML = function(str) {
   var div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+};
+
+Terminal.prototype._ensurePromptMarkup = function() {
+  if (!this.inputLine || this.inputLine.querySelector('.prompt-top')) return;
+  this.inputLine.className = 'prompt prompt-shell';
+  this.inputLine.innerHTML =
+    '<div class="prompt-top">' +
+      '<span class="prompt-corner">╭─</span>' +
+      '<span class="prompt-segment prompt-user">visitor@dave-arch</span>' +
+      '<span class="prompt-segment prompt-cwd">~/portfolio</span>' +
+      '<span class="prompt-segment prompt-git">main !0 ?0</span>' +
+    '</div>' +
+    '<div class="prompt-bottom">' +
+      '<span class="prompt-corner">╰─</span><span class="prompt-lambda">λ</span><span class="prompt-spacer">&nbsp;</span>' +
+      '<span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>' +
+      '<input type="text" id="command-input" autofocus autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="Terminal command input">' +
+    '</div>';
+  this.inputEl = this.container.querySelector('#command-input');
+  this.inputDisplay = this.container.querySelector('#input-display');
+  this.cursor = this.container.querySelector('#cursor');
+};
+
+Terminal.prototype._ensureModeIndicator = function() {
+  var existing = this.container.querySelector('.terminal-mode');
+  if (existing) {
+    this.modeEl = existing;
+    return;
+  }
+  this.modeEl = document.createElement('div');
+  this.modeEl.className = 'terminal-mode normal';
+  this.modeEl.textContent = '-- NORMAL --';
+  this.container.appendChild(this.modeEl);
+};
+
+Terminal.prototype._setMode = function(mode) {
+  if (!this.modeEl) return;
+  var insert = mode === 'insert';
+  this.modeEl.textContent = insert ? '-- INSERT --' : '-- NORMAL --';
+  this.modeEl.classList.toggle('insert', insert);
+  this.modeEl.classList.toggle('normal', !insert);
+};
+
+Terminal.prototype._cwdLabel = function() {
+  var cwd = (window.FS && FS.cwd) ? FS.cwd() : '/home/visitor/portfolio';
+  cwd = String(cwd || '/home/visitor/portfolio');
+  cwd = cwd.replace(/^\/home\/visitor/, '~');
+  if (cwd === '~') return '~';
+  if (cwd.length <= 30) return cwd;
+  return cwd.slice(0, 12) + '…' + cwd.slice(cwd.length - 15);
+};
+
+Terminal.prototype._gitLabel = function() {
+  return 'main !' + this.gitStatus.modified + ' ?' + this.gitStatus.untracked;
+};
+
+Terminal.prototype._updatePrompt = function() {
+  if (!this.inputLine) return;
+  var cwd = this.inputLine.querySelector('.prompt-cwd');
+  var git = this.inputLine.querySelector('.prompt-git');
+  if (cwd) cwd.textContent = this._cwdLabel();
+  if (git) {
+    git.textContent = this._gitLabel();
+    git.classList.toggle('dirty', this.gitStatus.modified > 0 || this.gitStatus.untracked > 0);
+  }
+};
+
+Terminal.prototype._promptEchoHTML = function(inputHTML) {
+  var cwd = this._escapeHTML(this._cwdLabel());
+  var git = this._escapeHTML(this._gitLabel());
+  var dirty = (this.gitStatus.modified > 0 || this.gitStatus.untracked > 0) ? ' dirty' : '';
+  return '<div class="prompt-echo">' +
+    '<div class="prompt-top">' +
+      '<span class="prompt-corner">╭─</span>' +
+      '<span class="prompt-segment prompt-user">visitor@dave-arch</span>' +
+      '<span class="prompt-segment prompt-cwd">' + cwd + '</span>' +
+      '<span class="prompt-segment prompt-git' + dirty + '">' + git + '</span>' +
+    '</div>' +
+    '<div class="prompt-bottom">' +
+      '<span class="prompt-corner">╰─</span><span class="prompt-lambda">λ</span><span class="prompt-spacer">&nbsp;</span>' +
+      '<span style="color:#ffffff">' + inputHTML + '</span>' +
+    '</div>' +
+  '</div>';
 };

@@ -57,10 +57,10 @@
     }
     // 4. Synthetic actions
     c.push({
-      label: 'Open About this PC',
-      hint: 'show owner panel',
+      label: 'Run neofetch',
+      hint: 'show profile',
       kind: 'action',
-      action: function () { if (window.Taskbar && Taskbar.showAbout) Taskbar.showAbout(); }
+      action: function () { if (window._terminalRef && typeof executeCommand === 'function') executeCommand('/about', window._terminalRef); }
     });
     c.push({
       label: 'Toggle terminal pane',

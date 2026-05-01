@@ -15,6 +15,10 @@
   var filtered = [];
   var selectedIdx = 0;
 
+  function launcherAnchor() {
+    return document.getElementById('taskbar-launcher') || document.getElementById('taskbar-os-label');
+  }
+
   function buildItems() {
     var arr = [];
 
@@ -207,7 +211,7 @@
     resultsEl = popout.querySelector('.launcher-results');
 
     // Position: anchored to bottom-left of taskbar
-    var os = document.getElementById('taskbar-os-label');
+    var os = launcherAnchor();
     if (os) {
       var r = os.getBoundingClientRect();
       popout.style.left = r.left + 'px';
@@ -223,7 +227,7 @@
       btn.addEventListener('click', function () {
         var action = btn.getAttribute('data-action');
         close();
-        if (action === 'about' && window.Taskbar && Taskbar.showAbout) Taskbar.showAbout();
+        if (action === 'about' && window._terminalRef && typeof executeCommand === 'function') executeCommand('/about', window._terminalRef);
         else if (action === 'lock' && window.LockScreen && LockScreen.lock) LockScreen.lock();
         else if (action === 'sleep' && window.LockScreen && LockScreen.lock) LockScreen.lock();
         else if (action === 'restart' && window._terminalRef && typeof executeCommand === 'function') {
@@ -262,7 +266,7 @@
   function onOutside(e) {
     if (!popout) return;
     if (popout.contains(e.target)) return;
-    var os = document.getElementById('taskbar-os-label');
+    var os = launcherAnchor();
     if (os && os.contains(e.target)) return;
     close();
   }

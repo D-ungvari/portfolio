@@ -103,7 +103,7 @@ T.describe('GameOverlay — Open/Close', function() {
     GameOverlay.open('https://example.com', 'TEST', mock);
     var overlay = _latestOsWindow();
     T.assertNotNull(overlay);
-    var closeBtn = overlay.querySelector('.os-window-btn.close');
+    var closeBtn = overlay.querySelector('.window-close');
     T.assertNotNull(closeBtn);
     _cleanupAllWindows();
   });
@@ -271,9 +271,9 @@ T.describe('Final Regression After Overlay', function() {
   });
 
   T.it('themes still work', function() {
-    applyTheme('amber');
-    T.assertEqual(currentTheme, 'amber');
-    applyTheme('green');
+    applyTheme('gruvbox');
+    T.assertEqual(currentTheme, 'gruvbox');
+    applyTheme('catppuccin');
   });
 
   T.it('boot still works', function() {

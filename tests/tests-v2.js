@@ -13,24 +13,24 @@ T.describe('Theme System — Data', function() {
     T.assertType(themes, 'object');
   });
 
-  T.it('has green theme', function() {
-    T.assertNotNull(themes.green);
+  T.it('has catppuccin theme', function() {
+    T.assertNotNull(themes.catppuccin);
   });
 
-  T.it('has amber theme', function() {
-    T.assertNotNull(themes.amber);
+  T.it('has gruvbox theme', function() {
+    T.assertNotNull(themes.gruvbox);
   });
 
-  T.it('has blue theme', function() {
-    T.assertNotNull(themes.blue);
+  T.it('has tokyonight theme', function() {
+    T.assertNotNull(themes.tokyonight);
   });
 
-  T.it('has matrix theme', function() {
-    T.assertNotNull(themes.matrix);
+  T.it('has nord theme', function() {
+    T.assertNotNull(themes.nord);
   });
 
   T.it('each theme has required color properties', function() {
-    var requiredProps = ['name', 'primary', 'dim', 'glow', 'scrollbar', 'border', 'chipBg'];
+    var requiredProps = ['name', 'bg', 'surface', 'primary', 'dim', 'accent', 'glow', 'scrollbar', 'border', 'chipBg'];
     var themeNames = Object.keys(themes);
     for (var i = 0; i < themeNames.length; i++) {
       var theme = themes[themeNames[i]];
@@ -60,15 +60,15 @@ T.describe('Theme System — Functions', function() {
     T.assertType(loadSavedTheme, 'function');
   });
 
-  T.it('currentTheme defaults to green', function() {
-    T.assertEqual(currentTheme, 'green');
+  T.it('currentTheme defaults to catppuccin', function() {
+    T.assertEqual(currentTheme, 'catppuccin');
   });
 
   T.it('applyTheme returns true for valid theme', function() {
-    var result = applyTheme('amber');
+    var result = applyTheme('gruvbox');
     T.assertTrue(result);
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
   });
 
   T.it('applyTheme returns false for invalid theme', function() {
@@ -77,31 +77,43 @@ T.describe('Theme System — Functions', function() {
   });
 
   T.it('applyTheme updates currentTheme', function() {
-    applyTheme('blue');
-    T.assertEqual(currentTheme, 'blue');
+    applyTheme('tokyonight');
+    T.assertEqual(currentTheme, 'tokyonight');
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
   });
 
   T.it('applyTheme sets CSS custom properties', function() {
-    applyTheme('amber');
+    applyTheme('gruvbox');
     var root = document.documentElement;
     var primary = root.style.getPropertyValue('--color-primary');
-    T.assertEqual(primary, '#ffb000');
+    T.assertEqual(primary, '#ebdbb2');
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
   });
 
   T.it('applyTheme persists to localStorage', function() {
-    applyTheme('blue');
+    applyTheme('tokyonight');
     try {
       var saved = localStorage.getItem('portfolio-theme');
-      T.assertEqual(saved, 'blue');
+      T.assertEqual(saved, 'tokyonight');
     } catch (e) {
       // localStorage may not be available in test env
     }
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
+  });
+
+  T.it('loadSavedTheme migrates legacy theme names', function() {
+    try {
+      localStorage.setItem('portfolio-theme', 'amber');
+      loadSavedTheme();
+      T.assertEqual(currentTheme, 'gruvbox');
+      T.assertEqual(localStorage.getItem('portfolio-theme'), 'gruvbox');
+    } catch (e) {
+      // localStorage may not be available in test env
+    }
+    applyTheme('catppuccin');
   });
 });
 
@@ -118,10 +130,10 @@ T.describe('Theme System — /theme Command', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/theme'].handler(mock);
     var text = mock.getAllText();
-    T.assertContains(text, 'green');
-    T.assertContains(text, 'amber');
-    T.assertContains(text, 'blue');
-    T.assertContains(text, 'matrix');
+    T.assertContains(text, 'catppuccin');
+    T.assertContains(text, 'gruvbox');
+    T.assertContains(text, 'tokyonight');
+    T.assertContains(text, 'nord');
   });
 
   T.it('/theme shows active theme', function() {
@@ -136,39 +148,39 @@ T.describe('Theme System — /theme Command', function() {
     T.assertContains(mock.getAllText(), '/theme <name>');
   });
 
-  T.it('/theme green is registered', function() {
-    T.assertNotNull(commandRegistry['/theme green']);
+  T.it('/theme catppuccin is registered', function() {
+    T.assertNotNull(commandRegistry['/theme catppuccin']);
   });
 
-  T.it('/theme amber is registered', function() {
-    T.assertNotNull(commandRegistry['/theme amber']);
+  T.it('/theme gruvbox is registered', function() {
+    T.assertNotNull(commandRegistry['/theme gruvbox']);
   });
 
-  T.it('/theme blue is registered', function() {
-    T.assertNotNull(commandRegistry['/theme blue']);
+  T.it('/theme tokyonight is registered', function() {
+    T.assertNotNull(commandRegistry['/theme tokyonight']);
   });
 
-  T.it('/theme matrix is registered', function() {
-    T.assertNotNull(commandRegistry['/theme matrix']);
+  T.it('/theme nord is registered', function() {
+    T.assertNotNull(commandRegistry['/theme nord']);
   });
 
   T.it('/theme <name> commands are hidden', function() {
-    T.assertTrue(commandRegistry['/theme green'].hidden);
-    T.assertTrue(commandRegistry['/theme amber'].hidden);
+    T.assertTrue(commandRegistry['/theme catppuccin'].hidden);
+    T.assertTrue(commandRegistry['/theme gruvbox'].hidden);
   });
 
-  T.it('/theme green applies green theme', function() {
+  T.it('/theme catppuccin applies catppuccin theme', function() {
     var mock = T.createMockTerminal();
-    commandRegistry['/theme green'].handler(mock);
-    T.assertEqual(currentTheme, 'green');
+    commandRegistry['/theme catppuccin'].handler(mock);
+    T.assertEqual(currentTheme, 'catppuccin');
   });
 
-  T.it('/theme amber applies amber theme', function() {
+  T.it('/theme gruvbox applies gruvbox theme', function() {
     var mock = T.createMockTerminal();
-    commandRegistry['/theme amber'].handler(mock);
-    T.assertEqual(currentTheme, 'amber');
+    commandRegistry['/theme gruvbox'].handler(mock);
+    T.assertEqual(currentTheme, 'gruvbox');
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
   });
 });
 
@@ -276,23 +288,38 @@ T.describe('Builtin Commands List', function() {
 
 T.describe('CSS Custom Properties', function() {
   T.it('--color-primary is set after theme apply', function() {
-    applyTheme('green');
+    applyTheme('catppuccin');
     var val = document.documentElement.style.getPropertyValue('--color-primary');
-    T.assertEqual(val, '#4af626');
+    T.assertEqual(val, '#cdd6f4');
   });
 
   T.it('--color-dim is set after theme apply', function() {
-    applyTheme('green');
+    applyTheme('catppuccin');
     var val = document.documentElement.style.getPropertyValue('--color-dim');
-    T.assertEqual(val, '#3a7a3a');
+    T.assertEqual(val, '#6c7086');
   });
 
-  T.it('--color-accent is defined in CSS reset', function() {
+  T.it('--color-accent is set after theme apply', function() {
     // This is set in CSS, not JS — just verify the theme system sets its own vars
-    applyTheme('amber');
-    var val = document.documentElement.style.getPropertyValue('--color-primary');
-    T.assertEqual(val, '#ffb000');
-    applyTheme('green');
+    applyTheme('gruvbox');
+    var val = document.documentElement.style.getPropertyValue('--color-accent');
+    T.assertEqual(val, '#fabd2f');
+    applyTheme('catppuccin');
+  });
+
+  T.it('--color-bg and --color-surface are set after theme apply', function() {
+    applyTheme('nord');
+    var root = document.documentElement;
+    T.assertEqual(root.style.getPropertyValue('--color-bg'), '#2e3440');
+    T.assertEqual(root.style.getPropertyValue('--color-surface'), '#3b4252');
+    applyTheme('catppuccin');
+  });
+
+  T.it('--color-arch is available as a theme-invariant token', function() {
+    applyTheme('tokyonight');
+    var val = window.getComputedStyle(document.documentElement).getPropertyValue('--color-arch').trim();
+    T.assertEqual(val, '#1793D1');
+    applyTheme('catppuccin');
   });
 
   T.it('all themes produce distinct primary colors', function() {
@@ -371,14 +398,7 @@ T.describe('Output Formatting Consistency', function() {
   T.it('/about ends with separator', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/about'].handler(mock);
-    var lastNonEmpty = null;
-    for (var j = mock.outputLog.length - 1; j >= 0; j--) {
-      if (mock.outputLog[j].text.trim() !== '') {
-        lastNonEmpty = mock.outputLog[j].text;
-        break;
-      }
-    }
-    T.assertContains(lastNonEmpty, '────');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-separator');
   });
 
   T.it('/contact ends with separator', function() {
@@ -403,7 +423,8 @@ T.describe('Boot Sequence — Edge Cases', function() {
   T.it('showWelcome produces at least 8 lines', function() {
     var mock = T.createMockTerminal();
     showWelcome(mock);
-    T.assert(mock.getOutputCount() >= 8, 'Should have ASCII art + tagline + hint');
+    T.assert(mock.getHTMLCount() >= 1, 'Should render neofetch markup');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-render');
   });
 
   T.it('WELCOME_ASCII lines are all same length (padded)', function() {
@@ -463,7 +484,7 @@ T.describe('Terminal Tab Completion', function() {
     var outputEl = container.querySelector('#output');
     outputEl.innerHTML = '';
 
-    // /theme and /theme green, /theme amber, etc — multiple matches for "/th"
+    // /theme and /theme catppuccin, /theme gruvbox, etc — multiple matches for "/th"
     term.inputEl.value = '/th';
     term._tabComplete();
     // Should have shown the matches in output
@@ -500,7 +521,7 @@ T.describe('Stress Tests', function() {
       applyTheme(themeNames[i % themeNames.length]);
     }
     // Reset
-    applyTheme('green');
+    applyTheme('catppuccin');
     T.assertTrue(true);
   });
 

@@ -10,7 +10,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 14px;
   line-height: 1.6;
   text-shadow: 0 0 8px var(--color-glow);
@@ -38,7 +38,7 @@
 #boot-splash .splash-spacer { height: 16px; }
 
 #boot-splash #splash-log {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 13px;
   text-align: left;
   width: 520px;
@@ -97,7 +97,7 @@
 
 /* GRUB stub — sprint E E10 */
 #boot-splash.grub {
-  font-family: 'Courier New', 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 #boot-splash.grub .grub-header {
   border-bottom: 1px solid var(--color-primary);
@@ -148,7 +148,7 @@
 #boot-splash.bios {
   background: #000080;
   color: #c0c0c0;
-  font-family: 'Courier New', 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   padding: 0;
   align-items: stretch;
   justify-content: stretch;

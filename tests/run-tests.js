@@ -99,6 +99,7 @@ const scripts = [
   path.join(basePath, 'js', 'notify.js'),
   path.join(basePath, 'js', 'shortcuts.js'),
   path.join(basePath, 'js', 'window-manager.js'),
+  path.join(basePath, 'js', 'workspaces.js'),
   path.join(basePath, 'js', 'palette.js'),
   path.join(basePath, 'js', 'shortcuts-cheatsheet.js'),
   path.join(basePath, 'js', 'terminal.js'),
@@ -106,6 +107,7 @@ const scripts = [
   path.join(basePath, 'js', 'projects.js'),
   path.join(basePath, 'js', 'game-overlay.js'),
   path.join(basePath, 'js', 'easter-eggs.js'),
+  path.join(basePath, 'js', 'neofetch.js'),
   path.join(basePath, 'js', 'bsod.js'),
   path.join(basePath, 'js', 'themes.js'),
   path.join(basePath, 'js', 'matrix.js'),
@@ -115,7 +117,6 @@ const scripts = [
   path.join(basePath, 'js', 'desktop.js'),
   path.join(basePath, 'js', 'context-menu.js'),
   path.join(basePath, 'js', 'taskbar.js'),
-  path.join(basePath, 'js', 'pinned-apps.js'),
   path.join(basePath, 'js', 'launcher.js'),
   path.join(basePath, 'js', 'tray-popouts.js'),
   path.join(basePath, 'js', 'quick-settings.js'),
@@ -134,6 +135,7 @@ const scripts = [
   path.join(basePath, 'js', 'app-commands.js'),
   path.join(basePath, 'js', 'lore.js'),
   path.join(basePath, 'js', 'fs.js'),
+  path.join(basePath, 'js', 'router.js'),
   path.join(basePath, 'js', 'terminal-tabs.js'),
   path.join(basePath, 'js', 'pane-toggle.js'),
   path.join(basePath, 'js', 'splitter.js'),
@@ -150,6 +152,9 @@ const scripts = [
   path.join(testPath, 'tests-v7.js'),
   path.join(testPath, 'tests-v8.js'),
   path.join(testPath, 'tests-os.js'),
+  path.join(testPath, 'tests-workspaces.js'),
+  path.join(testPath, 'tests-neofetch.js'),
+  path.join(testPath, 'tests-arch.js'),
 ];
 
 assertScriptParity(scripts);

@@ -11,7 +11,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: #0a0a0a;
-      color: #4af626;
+      color: #cdd6f4;
       font-family: 'JetBrains Mono', monospace;
       font-size: 14px;
       line-height: 1.6;
@@ -33,11 +33,23 @@
   <!-- Mirror of the production OS-shell DOM so tests can assert on it. -->
   <div id="os-shell">
     <header id="taskbar" role="banner">
-      <span id="taskbar-os-label">DavOS 1.0</span>
-      <span id="taskbar-workspace">─ workspace 1 ─</span>
-      <div id="taskbar-running" role="toolbar" aria-label="Running applications"></div>
-      <div id="taskbar-right">
-        <span id="taskbar-clock" aria-live="off">--:--</span>
+      <div class="bar-left">
+        <button id="taskbar-launcher" type="button" class="bar-launcher" aria-label="Open launcher" title="Open launcher">ARCH</button>
+        <div id="taskbar-workspaces" class="bar-workspaces" aria-label="Workspaces">
+          <button type="button" class="bar-pill workspace-pill active" data-workspace="1" aria-current="true">[1]</button>
+          <button type="button" class="bar-pill workspace-pill" data-workspace="2">[2]</button>
+          <button type="button" class="bar-pill workspace-pill" data-workspace="3">[3]</button>
+          <button type="button" class="bar-pill workspace-pill" data-workspace="4">[4]</button>
+          <button type="button" class="bar-pill workspace-pill" data-workspace="5">[5]</button>
+        </div>
+        <div id="taskbar-running" role="toolbar" aria-label="Running applications"></div>
+      </div>
+      <div class="bar-center" aria-live="polite"></div>
+      <div id="taskbar-right" class="bar-right">
+        <div id="taskbar-tray" class="bar-stat-strip"></div>
+        <button id="taskbar-notify-bell" type="button" class="bar-icon-btn" aria-label="Notifications" title="Notifications">
+          <span class="bell-icon">^</span><span class="notify-badge"></span>
+        </button>
       </div>
     </header>
     <main id="os-main" role="main">
@@ -58,13 +70,21 @@
           </div>
           <div id="terminal-body" aria-live="polite" aria-relevant="additions">
             <div id="output"></div>
-            <div id="input-line">
-              <span class="prompt">visitor@dave:~$&nbsp;</span>
-              <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
-              <input type="text" id="command-input"
-                     autofocus autocomplete="off"
-                     spellcheck="false" autocapitalize="off"
-                     aria-label="Terminal command input">
+            <div id="input-line" class="prompt prompt-shell">
+              <div class="prompt-top">
+                <span class="prompt-corner">╭─</span>
+                <span class="prompt-segment prompt-user">visitor@dave-arch</span>
+                <span class="prompt-segment prompt-cwd">~/portfolio</span>
+                <span class="prompt-segment prompt-git">main !0 ?0</span>
+              </div>
+              <div class="prompt-bottom">
+                <span class="prompt-corner">╰─</span><span class="prompt-lambda">λ</span><span class="prompt-spacer">&nbsp;</span>
+                <span id="input-display"></span><span id="cursor" class="cursor" aria-hidden="true">█</span>
+                <input type="text" id="command-input"
+                       autofocus autocomplete="off"
+                       spellcheck="false" autocapitalize="off"
+                       aria-label="Terminal command input">
+              </div>
             </div>
           </div>
         </div>
@@ -119,16 +139,23 @@
        In production these come from css/tokens.css; the harness inlines them here. -->
   <style id="harness-tokens">
     :root {
-      --color-bg: #0a0a0a;
-      --color-primary: #4af626;
-      --color-dim: #3a7a3a;
-      --color-glow: rgba(74, 246, 38, 0.3);
-      --color-border: #2a4a2a;
-      --color-scrollbar: #1a3a1a;
-      --color-chip-bg: #1a1a1a;
+      --color-bg: #1e1e2e;
+      --color-surface: #313244;
+      --color-primary: #cdd6f4;
+      --color-dim: #6c7086;
+      --color-glow: rgba(203, 166, 247, 0.28);
+      --color-border: #45475a;
+      --color-scrollbar: #45475a;
+      --color-chip-bg: #181825;
+      --color-arch: #1793D1;
+      --color-ok: #a6e3a1;
+      --color-fail: #f38ba8;
+      --color-warn: #f9e2af;
+      --font-mono: 'JetBrains Mono', 'Iosevka', 'Fira Code', ui-monospace, monospace;
       --terminal-width: 40%;
       --taskbar-height: 32px;
       --divider-width: 4px;
+      --window-gap: 12px;
     }
   </style>
 
@@ -139,6 +166,7 @@
   <script src="../js/notify.js"></script>
   <script src="../js/shortcuts.js"></script>
   <script src="../js/window-manager.js"></script>
+  <script src="../js/workspaces.js"></script>
   <script src="../js/palette.js"></script>
   <script src="../js/shortcuts-cheatsheet.js"></script>
   <script src="../js/terminal.js"></script>
@@ -146,6 +174,7 @@
   <script src="../js/projects.js"></script>
   <script src="../js/game-overlay.js"></script>
   <script src="../js/easter-eggs.js"></script>
+  <script src="../js/neofetch.js"></script>
   <script src="../js/themes.js"></script>
   <script src="../js/matrix.js"></script>
   <script src="../js/extras.js"></script>
@@ -162,6 +191,7 @@
   <script src="../js/app-commands.js"></script>
   <script src="../js/lore.js"></script>
   <script src="../js/fs.js"></script>
+  <script src="../js/router.js"></script>
   <script src="../js/terminal-tabs.js"></script>
   <script src="../js/pane-toggle.js"></script>
   <script src="../js/splitter.js"></script>
@@ -180,6 +210,9 @@
   <script src="tests-v7.js"></script>
   <script src="tests-v8.js"></script>
   <script src="tests-os.js"></script>
+  <script src="tests-workspaces.js"></script>
+  <script src="tests-neofetch.js"></script>
+  <script src="tests-arch.js"></script>
 
   <!-- Run tests.
        The Node runner (run-tests.js) calls TestHarness.run() itself, so

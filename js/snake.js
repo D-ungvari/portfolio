@@ -107,9 +107,9 @@
   function draw() {
     if (!ctx) return;
     var bg = themeColor('bg', '#0a0a0a');
-    var primary = themeColor('primary', '#4af626');
-    var accent = themeColor('accent', '#00d4ff');
-    var dim = themeColor('dim', '#3a7a3a');
+    var primary = themeColor('primary', '#cdd6f4');
+    var accent = themeColor('accent', '#cba6f7');
+    var dim = themeColor('dim', '#6c7086');
 
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);

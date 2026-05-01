@@ -20,30 +20,31 @@ T.describe('Easter Eggs — Neofetch', function() {
   T.it('/neofetch shows system info', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
-    var text = mock.getAllText();
-    T.assertContains(text, 'david@ungvari');
-    T.assertContains(text, 'OS:');
-    T.assertContains(text, 'Shell:');
-    T.assertContains(text, 'Theme:');
-    T.assertContains(text, 'Projects:');
+    var html = mock.htmlOutputLog[0].html;
+    T.assertContains(html, 'david@dave-arch');
+    T.assertContains(html, 'OS');
+    T.assertContains(html, 'Shell');
+    T.assertContains(html, 'Theme');
+    T.assertContains(html, 'Packages');
   });
 
-  T.it('/neofetch shows ASCII art face', function() {
+  T.it('/neofetch shows Arch ASCII logo', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
-    T.assertContains(mock.getAllText(), 'o_o');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-logo');
+    T.assertContains(mock.htmlOutputLog[0].html, 'oooooo');
   });
 
   T.it('/neofetch shows current theme', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
-    T.assertContains(mock.getAllText(), currentTheme);
+    T.assertContains(mock.htmlOutputLog[0].html, 'Catppuccin');
   });
 
-  T.it('/neofetch shows project count', function() {
+  T.it('/neofetch shows persona role', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
-    T.assertContains(mock.getAllText(), projects.length.toString());
+    T.assertContains(mock.htmlOutputLog[0].html, 'Full-stack Developer');
   });
 });
 
@@ -183,8 +184,9 @@ T.describe('Complete Easter Egg Inventory', function() {
   var allEasterEggs = [
     '/sudo', '/rm', '/rm -rf /', '/exit', '/hire',
     'hello', 'hi', '/whoami', '/date',
-    '/vim', '/emacs', '42',
+    '/vim', '/nvim', ':q', ':q!', ':wq', '/emacs', '42', 'btw',
     '/neofetch', '/cowsay', '/fortune', '/ping', '/uptime', '/echo',
+    '/pacman', '/pacman -syu', '/yay', '/paru', '/aur', '/dotfiles',
     '/matrix', '/banner', '/stats'
   ];
 
@@ -204,7 +206,7 @@ T.describe('Complete Easter Egg Inventory', function() {
     for (var i = 0; i < allEasterEggs.length; i++) {
       var mock = T.createMockTerminal();
       commandRegistry[allEasterEggs[i]].handler(mock);
-      T.assert(mock.getOutputCount() > 0, allEasterEggs[i] + ' should produce output');
+      T.assert(mock.getOutputCount() > 0 || mock.getHTMLCount() > 0, allEasterEggs[i] + ' should produce output');
     }
   });
 
@@ -244,11 +246,11 @@ T.describe('Final Command Count', function() {
 
 T.describe('Cross-Feature Integration', function() {
   T.it('/neofetch reflects current theme after switch', function() {
-    applyTheme('amber');
+    applyTheme('gruvbox');
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
-    T.assertContains(mock.getAllText(), 'amber');
-    applyTheme('green');
+    T.assertContains(mock.htmlOutputLog[0].html, 'Gruvbox');
+    applyTheme('catppuccin');
   });
 
   T.it('/stats shows correct project count', function() {

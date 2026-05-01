@@ -90,8 +90,8 @@ T.describe('/credits Command', function() {
 // ========================================
 
 T.describe('Final Project Inventory', function() {
-  T.it('7 projects with complete data', function() {
-    T.assertArrayLength(projects, 7);
+  T.it('5 projects with complete data', function() {
+    T.assertArrayLength(projects, 5);
     for (var i = 0; i < projects.length; i++) {
       T.assert(projects[i].command.length > 1, 'command too short');
       T.assert(projects[i].title.length > 0, 'title empty');
@@ -162,7 +162,7 @@ T.describe('CSS Variables Completeness', function() {
         T.assert(val.length > 0, themeNames[i] + ' ' + props[j] + ' should be set');
       }
     }
-    applyTheme('green');
+    applyTheme('catppuccin');
   });
 });
 

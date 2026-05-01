@@ -143,7 +143,7 @@ registerCommand('/stats', 'show session stats', function(terminal) {
   terminal.output('');
   terminal.output('  commands run   ' + commandCount);
   terminal.output('  session time   ' + timeStr);
-  terminal.output('  theme          ' + (typeof currentTheme !== 'undefined' ? currentTheme : 'green'));
+  terminal.output('  theme          ' + (typeof currentTheme !== 'undefined' ? currentTheme : 'catppuccin'));
   terminal.output('  history size   ' + (terminal.history ? terminal.history.length : 0));
   terminal.output('  projects       ' + projects.length);
   terminal.output('');

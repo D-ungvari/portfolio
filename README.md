@@ -45,7 +45,7 @@ window manager:
 - **Native apps** — `Settings`, `Mail`, `CV Viewer`, `Apps Grid`, `Boring View` (recruiter-mode plain-text CV)
 - **Command palette** — `Ctrl+K` fuzzy-search every command, project, theme, and shortcut
 - **Shortcuts cheatsheet** — `F1` opens a grouped overview of every keyboard combo
-- **Persona-driven** — a single `data/persona.json` (with embedded JS fallback) drives `/about`, `/availability`, `/cv-window`, `/boring`, the `About this PC` panel, the boot greeting
+- **Persona-driven** — a single `data/persona.json` (with embedded JS fallback) drives `/about`, `/availability`, `/cv-window`, `/boring`, the neofetch profile, and the boot greeting
 - **Lore + personality** — `/motd`, `/version`, `/changelog`, `/man <topic>`, `/docs <project>`, `/availability`, `/references`, `/lang en|da`, `/ask <question>`, `/interview` (60s recruiter tour), `/demo` (autopilot)
 - **Virtual filesystem** — `/pwd`, `/cd`, `/ls`, `/cat`, `/tree`, `/open`, `./swarm.app` shorthand, persistent cwd
 - **Multi-tab terminal** — `Ctrl+T` new, `Ctrl+W` close, `Ctrl+Tab` next

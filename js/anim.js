@@ -10,9 +10,10 @@
  *   Anim.crossfade(elOut, elIn, opts) -> Promise
  *   Anim.shake(el, opts)         -> Promise
  *   Anim.flyTo(el, fromRect, toRect, opts) -> Promise
- *   Anim.genie(el, targetRect, opts)       -> Promise (minimize)
- *   Anim.ungenie(el, fromRect, opts)       -> Promise (restore)
+ *   Anim.genie(el, targetRect, opts)       -> Promise (legacy)
+ *   Anim.ungenie(el, fromRect, opts)       -> Promise (legacy)
  *   Anim.slideIn(el, dir, opts)  -> Promise  ('up'|'down'|'left'|'right')
+ *   Anim.slideOut(el, dir, opts) -> Promise  ('up'|'down'|'left'|'right')
  *   Anim.fadeIn(el, opts)        -> Promise
  *   Anim.fadeOut(el, opts)       -> Promise
  *   Anim.pulse(el, opts)         -> Promise
@@ -200,6 +201,25 @@
     ], { duration: dur, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)', fill: 'forwards' });
   }
 
+  function slideOut(el, dir, opts) {
+    opts = opts || {};
+    var dur = opts.dur != null ? opts.dur : 140;
+    var distance = opts.distance != null ? opts.distance : 16;
+    var toX = '0px';
+    var toY = '0px';
+    switch (dir) {
+      case 'up':    toY = '-' + distance + 'px'; break;
+      case 'down':  toY = distance + 'px'; break;
+      case 'left':  toX = '-' + distance + 'px'; break;
+      case 'right': toX = distance + 'px'; break;
+      default:      toY = distance + 'px';
+    }
+    return run(el, [
+      { translate: '0px 0px', opacity: 1 },
+      { translate: toX + ' ' + toY, opacity: 0 }
+    ], { duration: dur, easing: 'cubic-bezier(0.4, 0, 0.6, 1)', fill: 'forwards' });
+  }
+
   function setTestMode(b) { testMode = !!b; }
 
   /**
@@ -256,6 +276,7 @@
     genie: genie,
     ungenie: ungenie,
     slideIn: slideIn,
+    slideOut: slideOut,
     typewriter: typewriter,
     glitch: glitch,
     reduced: reduced,

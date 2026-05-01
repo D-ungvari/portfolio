@@ -58,13 +58,13 @@ T.describe('/banner Command', function() {
   T.it('/banner shows ASCII art', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/banner'].handler(mock);
-    T.assertContains(mock.getAllText(), '██');
+    T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-logo');
   });
 
-  T.it('/banner shows tagline', function() {
+  T.it('/banner shows neofetch info', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/banner'].handler(mock);
-    T.assertContains(mock.getAllText(), 'full-stack');
+    T.assertContains(mock.htmlOutputLog[0].html, 'Full-stack Developer');
   });
 });
 
@@ -298,7 +298,7 @@ T.describe('Regression Tests', function() {
       var mock = T.createMockTerminal();
       executeCommand(cmds[i], mock);
       if (cmds[i] !== '/clear') {
-        T.assert(mock.getOutputCount() > 0, cmds[i] + ' should still work');
+        T.assert(mock.getOutputCount() > 0 || mock.getHTMLCount() > 0, cmds[i] + ' should still work');
       }
     }
   });
@@ -322,8 +322,9 @@ T.describe('Regression Tests', function() {
 
   T.it('theme commands still work after extras loaded', function() {
     var mock = T.createMockTerminal();
-    executeCommand('/theme green', mock);
-    T.assertEqual(currentTheme, 'green');
+    executeCommand('/theme gruvbox', mock);
+    T.assertEqual(currentTheme, 'gruvbox');
+    applyTheme('catppuccin');
   });
 });
 
@@ -573,6 +574,7 @@ T.describe('Complete Command Inventory', function() {
       T.assert('activePane' in s, 'activePane should be a session key');
       T.assert('visitCount' in s, 'visitCount should be a session key');
       T.assert('windows' in s, 'windows should be a session key');
+      T.assert('workspaces' in s, 'workspaces should be a session key');
     });
   });
 
@@ -637,11 +639,16 @@ T.describe('Complete Command Inventory', function() {
 
     T.it('exposes the documented public API', function () {
       var keys = ['open', 'close', 'minimize', 'restore', 'maximize',
-        'unmaximize', 'bringToFront', 'list', 'get', 'byApp',
+        'unmaximize', 'bringToFront', 'list', 'get', 'move', 'setWorkspace', 'showWorkspace', 'byApp',
         'activeId', 'snapActive', 'restoreSession'];
       for (var i = 0; i < keys.length; i++) {
         T.assertType(window.WindowManager[keys[i]], 'function', keys[i]);
       }
+    });
+
+    T.it('Anim exposes slideOut for i3-style minimize', function () {
+      T.assertType(window.Anim, 'object');
+      T.assertType(window.Anim.slideOut, 'function');
     });
 
     T.it('open() with a url returns an id', function () {
@@ -774,8 +781,11 @@ T.describe('Complete Command Inventory', function() {
     T.it('close button removes the window', function () {
       _cleanupAllWindows();
       WindowManager.open({ url: 'about:blank', title: 'X' });
-      var btn = document.querySelector('.os-window .os-window-btn.close');
+      var btn = document.querySelector('.os-window .window-close');
       T.assertNotNull(btn);
+      T.assertEqual(btn.textContent, '[X]');
+      T.assertEqual(document.querySelectorAll('.os-window .os-window-btn.min').length, 0);
+      T.assertEqual(document.querySelectorAll('.os-window .os-window-btn.max').length, 0);
       btn.click();
       T.assertEqual(document.querySelectorAll('.os-window').length, 0);
     });
@@ -787,6 +797,7 @@ T.describe('Complete Command Inventory', function() {
       var saved = window.Session.get('windows');
       T.assert(Array.isArray(saved), 'windows should be saved as array');
       T.assert(saved.length >= 1, 'at least one window should be persisted');
+      T.assert(saved[0].workspaceId != null, 'persisted windows should include workspaceId');
       _cleanupAllWindows();
     });
 
@@ -890,7 +901,7 @@ T.describe('Complete Command Inventory', function() {
       ensureClosed();
       Palette.open();
       var input = document.getElementById('palette-input');
-      input.value = 'theme: green';
+      input.value = 'theme: catppuccin';
       input.dispatchEvent(new window.Event('input', { bubbles: true }));
       var ev = new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
       input.dispatchEvent(ev);
@@ -993,25 +1004,25 @@ T.describe('Complete Command Inventory', function() {
     });
 
     T.it('applyTheme(name) sets --wallpaper-overlay on documentElement', function () {
-      applyTheme('amber');
+      applyTheme('gruvbox');
       var v = document.documentElement.style.getPropertyValue('--wallpaper-overlay');
       T.assert(v && v.length > 0, 'overlay var should be set');
-      applyTheme('green');
+      applyTheme('catppuccin');
     });
 
     T.it('applyTheme writes --color-primary-bg-soft / --color-primary-bg-softer', function () {
-      applyTheme('blue');
+      applyTheme('tokyonight');
       var soft = document.documentElement.style.getPropertyValue('--color-primary-bg-soft');
       var softer = document.documentElement.style.getPropertyValue('--color-primary-bg-softer');
       T.assert(soft && soft.length > 0);
       T.assert(softer && softer.length > 0);
-      applyTheme('green');
+      applyTheme('catppuccin');
     });
 
     T.it('applyTheme returns true for known themes, false for unknown', function () {
-      T.assertTrue(applyTheme('amber'));
+      T.assertTrue(applyTheme('gruvbox'));
       T.assertFalse(applyTheme('not-a-real-theme'));
-      applyTheme('green');
+      applyTheme('catppuccin');
     });
 
     T.it('themes object has at least 4 themes', function () {
@@ -1059,16 +1070,17 @@ T.describe('Complete Command Inventory', function() {
       T.assertTrue(hasArt || hasFallback, 'trash should have art or fallback content');
     });
 
-    T.it('Taskbar.init creates the system tray (rate/vol/bat/eq)', function () {
+    T.it('Taskbar.init creates the polybar stat strip', function () {
       // The taskbar init runs once on DCL; re-call to be safe.
       if (window.Taskbar && Taskbar.init) Taskbar.init();
       var tray = document.getElementById('taskbar-tray');
-      // tray-rate/vol/bat/eq must each exist as .tray-item children
       if (tray) {
-        T.assertNotNull(tray.querySelector('.tray-rate'));
-        T.assertNotNull(tray.querySelector('.tray-vol'));
-        T.assertNotNull(tray.querySelector('.tray-bat'));
-        T.assertNotNull(tray.querySelector('.tray-eq'));
+        T.assertNotNull(tray.querySelector('.bar-pill-cpu'));
+        T.assertNotNull(tray.querySelector('.bar-pill-mem'));
+        T.assertNotNull(tray.querySelector('.bar-pill-net'));
+        T.assertNotNull(tray.querySelector('.bar-pill-kernel'));
+        T.assertNotNull(tray.querySelector('.bar-pill-branch'));
+        T.assertNotNull(tray.querySelector('.bar-pill-clock'));
       } else {
         // If tray wasn't created (because tests/index.html is a stripped DOM),
         // at least confirm taskbar init didn't throw.

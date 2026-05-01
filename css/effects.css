@@ -70,7 +70,7 @@
   bottom: 24px;
   right: 24px;
   z-index: 6500;
-  font-family: "JetBrains Mono", monospace;
+  font-family: var(--font-mono);
   display: flex;
   align-items: flex-end;
   gap: 8px;

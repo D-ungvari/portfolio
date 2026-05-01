@@ -23,16 +23,6 @@
   user-select: none;
 }
 
-#taskbar-os-label {
-  color: var(--color-primary);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-#taskbar-workspace {
-  color: var(--color-dim);
-}
-
 #taskbar-right {
   margin-left: auto;
   display: flex;

@@ -15,7 +15,7 @@
     "synopsis": "portfolio [--theme=NAME] [--mode=desktop|terminal|boring]",
     "description": "An OS-style developer portfolio. Click icons or type commands. 7 projects, 4 themes, 50+ commands, easter eggs, recruiter mode. Zero dependencies, vanilla HTML/CSS/JS, ~7000 LOC.",
     "options": [
-      "--theme=NAME      green (default), amber, blue, matrix",
+      "--theme=NAME      catppuccin (default), gruvbox, tokyonight, nord",
       "--mode=MODE       desktop (default), terminal-only, boring (static CV)"
     ],
     "see_also": "dave(1), /help, /grid, /boring"
@@ -43,20 +43,6 @@
     "description": "20 levels of escape rooms built around manipulative UI: cookie banners, deceptive checkboxes, hostile unsubscribes. Vanilla JS.",
     "options": ["(no flags — just escape)"],
     "see_also": "/docs uxcrimes"
-  },
-  "jobtracker": {
-    "name": "jobtracker — AI-powered job application tracker",
-    "synopsis": "jobtracker",
-    "description": "Full-stack Kanban board for job hunts. Claude API for resume parsing, pgvector for semantic search, .NET 8 extraction pipeline, dockerized, CI/CD.",
-    "options": ["(see live demo)"],
-    "see_also": "/docs jobtracker"
-  },
-  "knowledgebase": {
-    "name": "knowledgebase — personal wiki with hybrid RAG",
-    "synopsis": "knowledgebase",
-    "description": "Notes app with full-text + semantic search via pgvector embeddings. RAG pipeline for natural-language queries over your own notes.",
-    "options": ["(see live demo)"],
-    "see_also": "/docs knowledgebase"
   },
   "platformer": {
     "name": "platformer — arcade platform shooter",

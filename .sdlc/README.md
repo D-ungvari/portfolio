@@ -3,6 +3,7 @@
 Convention for this project's SDLC artifacts.
 
 ## Files
+- `VISION.md` — product-owner layer (why, who-for, pillars, non-goals, phase roadmap with DoD). User-owned. Plans propose diffs but never apply unilaterally.
 - `PROGRESS.md` — current phase, last work item, cross-session pickup state
 - `BACKLOG.md` — ordered queue + completed table
 - `DECISIONS.md` — append-only ADRs
