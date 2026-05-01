@@ -1,31 +1,31 @@
 /**
  * Neofetch renderer for the Arch redesign.
- * Arch logo shape follows fastfetch's built-in arch.txt, with color markers removed.
- * Source: https://github.com/fastfetch-cli/fastfetch/blob/dev/src/logo/ascii/arch.txt
+ * DavOS ASCII logo: ANSI Shadow wordmark + tiling-WM workspace strip + terminal motif.
+ * Replaces canonical Arch pyramid with a DavOS-branded variant that still reads
+ * as a developer-distro neofetch render.
  */
 (function () {
   'use strict';
 
   var ARCH_LOGO = [
-    '                   -`',
-    '                  .o+`',
-    '                 `ooo/',
-    '                `+oooo:',
-    '               `+oooooo:',
-    '              -+oooooo+:',
-    '            `/:-:++oooo+:',
-    '           `/++++/+++++++:',
-    '          `/++++++++++++++:',
-    '         `/+++oooooooooooo/`',
-    '        ./ooosssso++osssssso+`',
-    '       .oossssso-````/ossssss+`',
-    '      -osssssso.      :ssssssso.',
-    '     :osssssss/        osssso+++.',
-    '    /ossssssss/        +ssssooo/-',
-    '  `/ossssso+/:-        -:/+osssso+-',
-    ' `+sso+:-`                 `.-/+oso:',
-    '`++:.                           `-/+/',
-    '.`                                 `/'
+    '  ██████╗  █████╗ ██╗   ██╗ ██████╗ ███████╗',
+    '  ██╔══██╗██╔══██╗██║   ██║██╔═══██╗██╔════╝',
+    '  ██║  ██║███████║██║   ██║██║   ██║███████╗',
+    '  ██║  ██║██╔══██║╚██╗ ██╔╝██║   ██║╚════██║',
+    '  ██████╔╝██║  ██║ ╚████╔╝ ╚██████╔╝███████║',
+    '  ╚═════╝ ╚═╝  ╚═╝  ╚═══╝   ╚═════╝ ╚══════╝',
+    '',
+    '          [1] [2] [3] [4] [5]',
+    '',
+    '   ╭───────────────────────────────────────╮',
+    '   │ ╳            visitor@dave-arch        │',
+    '   ├───────────────────────────────────────┤',
+    '   │ ╭─ ~/portfolio  main !2 ?1            │',
+    '   │ ╰─λ                                   │',
+    '   │                                       │',
+    '   ╰───────────────────────────────────────╯',
+    '          a tiling-wm developer os.',
+    '                btw i use arch.'
   ];
 
   var THEME_NAMES = {

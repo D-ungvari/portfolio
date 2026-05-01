@@ -28,11 +28,11 @@ T.describe('Easter Eggs — Neofetch', function() {
     T.assertContains(html, 'Packages');
   });
 
-  T.it('/neofetch shows Arch ASCII logo', function() {
+  T.it('/neofetch shows DavOS ASCII logo', function() {
     var mock = T.createMockTerminal();
     commandRegistry['/neofetch'].handler(mock);
     T.assertContains(mock.htmlOutputLog[0].html, 'neofetch-logo');
-    T.assertContains(mock.htmlOutputLog[0].html, 'oooooo');
+    T.assertContains(mock.htmlOutputLog[0].html, 'visitor@dave-arch');
   });
 
   T.it('/neofetch shows current theme', function() {
